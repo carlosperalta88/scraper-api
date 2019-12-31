@@ -5,8 +5,8 @@ const logger = require('../config/winston')
 
 exports.addRoleToScraperQueue = async (req, res) => {
   try {
-    const caseToAdd = await findRole(req.params.role)
-    const response = await request.do(addCasesPayloadBuilder([caseToAdd]))
+    const caseToAdd = await findByRoleAndCourt(req.params.role, req.params.court)
+    const response = await request.do(addCasesPayloadBuilder(caseToAdd))
     res.json(response)
   } catch (e) {
     logger.error(`couldn't add role to queue ${e}`)
@@ -14,8 +14,8 @@ exports.addRoleToScraperQueue = async (req, res) => {
   }
 }
 
-const findRole = async (role) => {
-  const r = await Case.find({ role })
+const findByRoleAndCourt = async (role, court) => {
+  const r = await Case.find({ role, "court.external_id": court })
   return r
 }
 
