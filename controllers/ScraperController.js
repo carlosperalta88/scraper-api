@@ -58,7 +58,7 @@ exports.executeScraper = async (req, res) => {
     setTimeout(() => {
       response = request.do(payload)
       if (--index) loop(index)
-    }, 2500)})(5)
+    }, 2500)})(9)
     res.send('starting')
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)

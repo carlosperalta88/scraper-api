@@ -2,3 +2,4 @@ node_modules
 error.log
 logs/app.log
 variables.env
+.DS_Store

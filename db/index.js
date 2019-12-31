@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const DB_URI = 'mongodb://localhost:27017/test-scraper';
+const DB_URI = process.env.DB_URI
 
 function connect() {
   return new Promise((resolve, reject) => {

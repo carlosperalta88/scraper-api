@@ -558,7 +558,7 @@ describe('CRUD Cases success', () => {
 
       const body = updatedCase.body
       expect(body).to.have.keys(['cause_history', 'exhorts', 'pending_docs', 'receptor', 'document_status', '_id', '__v',
-                                'court', 'cover', 'date', 'is_active', 'updated_at', 'users', 'role'])
+                                'court', 'cover', 'date', 'is_active', 'updated_at', 'users', 'role', 'created_at'])
       expect(body['receptor']).to.have.length(11)
       expect(body['receptor'][0]).to.have.keys(['book', 'retrieve_data', 'status'])
       expect(body['cause_history']).to.have.length(2)
@@ -580,7 +580,7 @@ describe('CRUD Cases success', () => {
     const getCase = await request(app).get('/api/v1/cases/C-9585-2017')
     const [body] = getCase.body
     expect(body).to.have.keys(['cause_history', 'exhorts', 'pending_docs', 'receptor', 'document_status', '_id', '__v',
-                              'court', 'cover', 'date', 'is_active', 'updated_at', 'users', 'role'])
+                              'court', 'cover', 'date', 'is_active', 'updated_at', 'users', 'role', 'created_at'])
     expect(body['receptor']).to.have.length(11)
     expect(body['receptor'][0]).to.have.keys(['book', 'retrieve_data', 'status'])
     expect(body['cause_history']).to.have.length(2)
