@@ -13,12 +13,16 @@ class CaseService {
     return await this.cases.find({ role: role })
   }
 
-  async updateOne(role) {
+  async deleteOne(role) {
     return await this.cases.updateOne({ role: role }, { is_active: false })
   }
 
   async insertMany(items) {
     return await this.cases.insertMany(items)
+  }
+
+  async getAllActiveRoles() {
+    return await this.cases.find({ is_active: true })
   }
   
   formatScraperResponse(scraperResponse) {
@@ -62,7 +66,7 @@ class CaseService {
     return comparisson
   }
   
-  async caseCreator(role, court_id) {
+  async caseCreator(role, court_id, external_id) {
     let court
     try {
       court = await this.courts.find({ external_id: court_id })
@@ -73,6 +77,7 @@ class CaseService {
     return new Cases({
       role: role,
       court: court[0],
+      external_id: external_id,
       is_active: true
     })
   }

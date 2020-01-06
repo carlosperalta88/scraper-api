@@ -1,9 +1,10 @@
 const logger = require('../config/winston')
+const request = require('../lib/api')
 import CaseService from '../service/cases'
 
 exports.addCase = async (req, res) => {
   try {
-    const newCase = await CaseService.caseCreator(req.body.role, req.body.court_id)
+    const newCase = await CaseService.caseCreator(req.body.role, req.body.court_id, req.body.external_id)
     await newCase.save()
     res.status(201).json(newCase)
   } catch (error) {
@@ -13,7 +14,7 @@ exports.addCase = async (req, res) => {
 }
 
 exports.addCases = async (req, res) => {
-  Promise.all(req.body.cases.map(async item => CaseService.caseCreator(item.role, item.court_id)))
+  Promise.all(req.body.cases.map(async item => CaseService.caseCreator(item.role, item.court_id, item.external_id)))
     .then(async (items) => {  
       await CaseService.insertMany(items)
       res.status(201).json(items)
@@ -32,7 +33,7 @@ exports.getCaseByRole = async (req, res) => {
 
 exports.deleteCaseByRole = async (req, res) => {
   try {
-    const query = await CaseService.updateOne(req.params.role)
+    const query = await CaseService.deleteOne(req.params.role)
     res.json(query)
   } catch (error) {
     logger.info(error)
@@ -63,6 +64,24 @@ exports.update = async (req, res) => {
       res.send(error).status(500)
       return 
     }
+  } catch (error) {
+    logger.error(`failed formatting the cause ${error}`)
+    res.send(error).status(500)
+  }
+}
+
+exports.buildReport = async (req, res) => {
+  try {
+    const data = await CaseService.getAllActiveRoles()
+    const payload = {
+      json: true,
+      uri: `${process.env.REPORT_URL}/generate`,
+      method: 'POST',
+      body: { data }
+    }
+
+    const response = await request.do(payload)
+    res.json(response)
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)
     res.send(error).status(500)

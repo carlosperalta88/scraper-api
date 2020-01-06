@@ -49,16 +49,32 @@ const findAllActiveRoles = async () => {
   return cases
 }
 
+const getQueueLength = async (name) => {
+ try {
+   const payload = {
+     method: 'GET',
+     uri: `${process.env.SCRAPER_URL}/scraper/count?name=${name}`
+   }
+   const response = await request.do(payload)
+   return response
+ } catch (e) {
+  this.logger.info(error)
+  throw new Error(error)
+ }
+}
+
 exports.executeScraper = async (req, res) => {
   try {
+    const queue_length = await getQueueLength(req.params.name)
+
     (function loop (index) {const payload = {
       method: 'GET',
-      uri: `${process.env.SCRAPER_URL}/execute`
+      uri: `${process.env.SCRAPER_URL}/execute?queue=${req.params.name}`
     }
     setTimeout(() => {
       response = request.do(payload)
       if (--index) loop(index)
-    }, 2500)})(9)
+    }, 2500)})(queue_length)
     res.send('starting')
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)
