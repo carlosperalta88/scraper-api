@@ -1,6 +1,6 @@
 const logger = require('../config/winston')
 const request = require('../lib/api')
-import CaseService from '../service/cases'
+import CaseService from '../services/cases'
 
 exports.addCase = async (req, res) => {
   try {
@@ -44,9 +44,9 @@ exports.deleteCaseByRole = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     let [storedVersion] = await CaseService.requestCase(req.params.role)
-    const isUpdated = CaseService.compareCases(storedVersion, req.body)
+    const casesComparisson = CaseService.compareCases(storedVersion, req.body)
     
-    if(!isUpdated) {
+    if(!casesComparisson.hasChanged) {
       logger.info(`no need to update ${req.params.role}`)
       res.send(`Nothing to update, entity ${req.params.role} has not changed`).status(200)
       return

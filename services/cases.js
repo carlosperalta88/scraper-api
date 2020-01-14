@@ -1,5 +1,6 @@
 const Cases = require('../models/Cases')
 const Courts = require('../models/Courts')
+const Notifications = require('../services/notifications')
 const logger = require('../config/winston')
 
 class CaseService {
@@ -7,6 +8,7 @@ class CaseService {
     this.cases = Cases
     this.courts = Courts
     this.logger = logger
+    this.notifications = Notifications
   }
 
   async requestCase(role) {
@@ -17,12 +19,20 @@ class CaseService {
     return await this.cases.updateOne({ role: role }, { is_active: false })
   }
 
+  async update(query, edit) {
+    return await this.cases.updateOne(query, edit)
+  }
+
   async insertMany(items) {
     return await this.cases.insertMany(items)
   }
 
   async getAllActiveRoles() {
     return await this.cases.find({ is_active: true })
+  }
+
+  async search(query) {
+    return await this.cases.find(query)
   }
   
   formatScraperResponse(scraperResponse) {
@@ -50,11 +60,14 @@ class CaseService {
   
   compareCases(storedVersion, scraperResponse) {
     const scraperResponseFormatted = this.formatScraperResponse(scraperResponse)
+    let diff = []
     const comparisson = Object.keys(scraperResponseFormatted).map((el) => {
       if(!storedVersion.hasOwnProperty(el)) return false
   
       if(typeof scraperResponseFormatted[el] == 'object') {
-        return (scraperResponseFormatted[el].length === storedVersion[el].length)
+        let assert = (scraperResponseFormatted[el].length === storedVersion[el].length)
+        if (assert) diff.append(el)
+        return assert
       }
       if(el === 'document_status') {
         return (scraperResponseFormatted[el].trim() === storedVersion[el].trim())
@@ -63,7 +76,7 @@ class CaseService {
         return (scraperResponseFormatted[el] === storedVersion[el]['name'])
       }
     }).reduce((acc, cv) => acc === cv)
-    return comparisson
+    return { hasChanged: comparisson, diff }
   }
   
   async caseCreator(role, court_id, external_id) {
@@ -85,7 +98,7 @@ class CaseService {
   buildPayload(storedVersion, req) {
     storedVersion['cover'] = req.body['role_search'][0]['cover']
     let role_date = req.body['role_search'][0]['date'].split('/')
-    storedVersion['date'] = new Date(role_date[2], role_date[1], role_date[0]).toISOString().split('T')[0]
+    storedVersion['date'] = new Date(role_date[2], role_date[1]-1, role_date[0]).toISOString().split('T')[0]
     storedVersion['document_status'] = req.body['status']
     storedVersion['receptor'] = req.body['receptor']
     storedVersion['pending_docs'] = req.body['pending_docs']

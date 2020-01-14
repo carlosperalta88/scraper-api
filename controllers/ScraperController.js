@@ -66,3 +66,18 @@ exports.executeScraper = async (req, res) => {
     res.status(500).send({ error: e.name, message: e.message })
   }
 }
+
+exports.getQueueLength = async (req, res) => {
+  try {
+    const payload = {
+      method: 'GET',
+      json: true,
+      uri: `${process.env.SCRAPER_URL}/count?name=${req.query.queue}`
+    }
+    const response = request.do(payload)
+    res.json(response).status(200)
+  } catch (error) {
+    logger.error(`failed to get queue length`)
+    res.send({ error: error.name, message: error.message }).status(500)
+  }
+}
