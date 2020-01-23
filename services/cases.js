@@ -152,6 +152,40 @@ class CaseService {
           } 
         }
       },
+      exhorts_details_date: {
+        $let: {
+          vars: {
+            splitted_details: { $map: {
+                input: '$exhorts',
+                as: 'ex',
+                in: '$$ex.role_destination_detail'
+              }
+            }
+          },
+          in: { $map: {
+              input: { $map: {
+                  input: { $reduce: {
+                      input: '$$splitted_details',
+                      initialValue: [],
+                      in: { $concatArrays: ['$$value', '$$this']}
+                    } 
+                  },
+                  as: 'ex',
+                  in: { $split: ['$$ex.date', '/'] }
+                } 
+              },
+              as: 'rd',
+              in: { $dateFromString: {
+                  dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  format: '%d-%m-%Y',
+                  onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  onNull: ''
+                } 
+              }
+            }
+          } 
+        }
+      }
     }
     }
   }
@@ -184,6 +218,7 @@ class CaseService {
     let sorted = rawReport.map((rep) => {
       rep['exhorts_order_date'] = (!rep['exhorts_order_date'] ? [] : rep['exhorts_order_date'].sort(this.sortDates).slice(-1))
       rep['exhorts_added_date'] = (!rep['exhorts_added_date'] ? [] : rep['exhorts_added_date'].sort(this.sortDates).slice(-1))
+      rep['exhorts_details_date'] = (!rep['exhorts_details_date'] ? [] : rep['exhorts_details_date'].sort(this.sortDates).slice(-1))
       rep['last_reception'] = (!rep['last_reception'] ? [] : rep['last_reception'].sort(this.sortDates).slice(-1))
       rep['book_1'] = (!rep['book_1'] ? [] : rep['book_1'].sort(this.sortDates).slice(-1))
       rep['book_2'] = (!rep['book_2'] ? [] : rep['book_2'].sort(this.sortDates).slice(-1))
