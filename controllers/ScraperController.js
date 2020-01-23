@@ -51,6 +51,9 @@ const findAllActiveRoles = async () => {
 
 exports.executeScraper = async (req, res) => {
   try {
+    if (!req.query.queue) {
+      throw new Error('Missing queue name')
+    }
     (function loop (index) {const payload = {
       method: 'GET',
       json: true,

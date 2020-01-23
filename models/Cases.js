@@ -13,8 +13,12 @@ var CasesSchema = new Schema({
   "pending_docs": [],
   "cause_history": [],
   "exhorts": [],
-  "users": [Schema.Types.ObjectId],
+  "users": [],
   "is_active": Boolean
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
+
+CasesSchema.index({
+  role: 'text'
+})
 
 module.exports = mongoose.model('Cases', CasesSchema)

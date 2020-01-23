@@ -26,6 +26,7 @@ exports.getCaseByRole = async (req, res) => {
     const reqCase = await CaseService.requestCase(req.params.role)
     res.json(reqCase)
   } catch (error) {
+    console.log(error)
     logger.info(error)
     res.status(500).send(error)
   }
@@ -41,7 +42,7 @@ exports.deleteCaseByRole = async (req, res) => {
   }
 }
 
-exports.update = async (req, res) => {
+exports.compare = async(req, res, next) => {
   try {
     let [storedVersion] = await CaseService.requestCase(req.params.role)
     const casesComparisson = CaseService.compareCases(storedVersion, req.body)
@@ -52,21 +53,26 @@ exports.update = async (req, res) => {
       return
     }
 
-    storedVersion = CaseService.buildPayload(storedVersion, req)
-
-    try {
-      await storedVersion.save()
-      logger.info(`${req.params.role} saved`)
-      res.json(storedVersion).status(204)
-      return 
-    } catch (error) {
-      logger.info(`failed saving the cause ${error}`)
-      res.send(error).status(500)
-      return 
-    }
+    res.locals.storedVersion = storedVersion
+    res.locals.caseDiff = casesComparisson.diff
+    next()
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)
     res.send(error).status(500)
+  }
+}
+
+exports.update = async (req, res) => {
+  try {
+    let storedVersion = CaseService.buildPayload(res.locals.storedVersion, req)
+    await storedVersion.save()
+    logger.info(`${req.params.role} saved`)
+    res.json(storedVersion).status(204)
+    return 
+  } catch (error) {
+    logger.info(`failed saving the cause ${error}`)
+    res.send(error).status(500)
+    return 
   }
 }
 

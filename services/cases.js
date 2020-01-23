@@ -9,10 +9,188 @@ class CaseService {
     this.courts = Courts
     this.logger = logger
     this.notifications = Notifications
+    this.reportAggregation = { 
+      $project: {
+      role: 1,
+      court: '$court.name',
+      document_status: 1,
+      external_id: 1,
+      cover: 1,
+      date: 1,
+      last_reception: {
+        $let: {
+          vars: {
+            splitted_dates: { $map: {
+              input: '$receptor',
+              as: 'ex',
+              in: { $split: [{ $arrayElemAt: [{ $split: [{ $arrayElemAt: [{ $split: ['$$ex.retrieve_data', '.' ]}, 0]}, ' -  ']}, 1]}, '/']}
+              }
+            }
+          },
+          in: { $map: {
+              input: '$$splitted_dates',
+              as: 'rd',
+              in: { $dateFromString: {
+                  dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  format: '%d-%m-%Y',
+                  onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  onNull: ''
+                } 
+              }
+            }
+          }
+        } 
+      },
+      book_1: {
+        $let: {
+          vars: {
+            book: { $arrayElemAt: [ '$cause_history', 0 ]},
+          },
+          in: {
+            $let: {
+              vars: {
+                splitted_dates: { $map: {
+                    input: '$$book.history',
+                    as: 'ex',
+                    in: { $split: [{ $arrayElemAt: [{ $split: ['$$ex.procedure_date', ' ' ]}, 0]}, '/'] }
+                  }
+                }
+              },
+              in: { $map: {
+                  input: '$$splitted_dates',
+                  as: 'rd',
+                  in: { $dateFromString: {
+                      dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      format: '%d-%m-%Y',
+                      onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      onNull: ''
+                    } 
+                  }
+                }
+              } 
+            }
+          }
+        }
+      }, 
+      book_2: {
+        $let: {
+          vars: {
+            book: { $arrayElemAt: [ '$cause_history', 1 ]},
+          },
+          in: {
+            $let: {
+              vars: {
+                splitted_dates: { $map: {
+                    input: '$$book.history',
+                    as: 'ex',
+                    in: { $split: [{ $arrayElemAt: [{ $split: ['$$ex.procedure_date', ' ' ]}, 0]}, '/'] }
+                  }
+                }
+              },
+              in: { $map: {
+                  input: '$$splitted_dates',
+                  as: 'rd',
+                  in: { $dateFromString: {
+                      dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      format: '%d-%m-%Y',
+                      onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      onNull: ''
+                    } 
+                  }
+                }
+              } 
+            }
+          }
+        }
+      },
+      last_pending_doc: { $arrayElemAt: [ '$pending_docs', 0]},
+      exhorts_added_date: {
+        $let: {
+          vars: {
+            splitted_dates: { $map: {
+                input: '$exhorts',
+                as: 'ex',
+                in: { $split: ['$$ex.exhort_added_date', '/'] }
+              }
+            }
+          },
+          in: { $map: {
+              input: '$$splitted_dates',
+              as: 'rd',
+              in: { $dateFromString: {
+                  dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  format: '%d-%m-%Y',
+                  onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  onNull: ''
+                } 
+              }
+            }
+          } 
+        }
+      },
+      exhorts_order_date: {
+        $let: {
+          vars: {
+            splitted_dates: { $map: {
+                input: '$exhorts',
+                as: 'ex',
+                in: { $split: ['$$ex.exhort_order_date', '/'] }
+              }
+            }
+          },
+          in: { $map: {
+              input: '$$splitted_dates',
+              as: 'rd',
+              in: { $dateFromString: {
+                  dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  format: '%d-%m-%Y',
+                  onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                  onNull: ''
+                } 
+              }
+            }
+          } 
+        }
+      },
+    }
+    }
+  }
+
+  sortDates(dateA, dateB) {
+    if (dateA > dateB) return 1
+    if (dateA < dateB) return -1
+    return 0
+  }
+
+  applySort(listOfCases) {
+    return listOfCases.map((rep) => {
+      rep['exhorts_order_date'] = (!rep['exhorts_order_date'] ? [] : rep['exhorts_order_date'].sort(this.sortDates).slice(-1))
+      rep['exhorts_added_date'] = (!rep['exhorts_added_date'] ? [] : rep['exhorts_added_date'].sort(this.sortDates).slice(-1))
+      rep['last_reception'] = (!rep['last_reception'] ? [] : rep['last_reception'].sort(this.sortDates).slice(-1))
+      rep['book_1'] = (!rep['book_1'] ? [] : rep['book_1'].sort(this.sortDates).slice(-1))
+      rep['book_2'] = (!rep['book_2'] ? [] : rep['book_2'].sort(this.sortDates).slice(-1))
+      return rep
+    })
   }
 
   async requestCase(role) {
-    return await this.cases.find({ role: role })
+    const rawReport = await this.cases.aggregate([
+      {
+        $match: { role: role }
+      },
+      this.reportAggregation
+    ])
+
+    let sorted = rawReport.map((rep) => {
+      rep['exhorts_order_date'] = (!rep['exhorts_order_date'] ? [] : rep['exhorts_order_date'].sort(this.sortDates).slice(-1))
+      rep['exhorts_added_date'] = (!rep['exhorts_added_date'] ? [] : rep['exhorts_added_date'].sort(this.sortDates).slice(-1))
+      rep['last_reception'] = (!rep['last_reception'] ? [] : rep['last_reception'].sort(this.sortDates).slice(-1))
+      rep['book_1'] = (!rep['book_1'] ? [] : rep['book_1'].sort(this.sortDates).slice(-1))
+      rep['book_2'] = (!rep['book_2'] ? [] : rep['book_2'].sort(this.sortDates).slice(-1))
+      return rep
+    })
+
+    return sorted
   }
 
   async deleteOne(role) {
@@ -28,7 +206,13 @@ class CaseService {
   }
 
   async getAllActiveRoles() {
-    return await this.cases.find({ is_active: true })
+    const allRoles = await this.cases.aggregate([
+      {
+        $match: { is_active: true }
+      },
+      this.reportAggregation
+    ])
+    return this.applySort(allRoles)
   }
 
   async search(query) {
