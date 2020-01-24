@@ -62,7 +62,7 @@ exports.executeScraper = async (req, res) => {
     setTimeout(() => {
       let response = request.do(payload)
       if (--index) loop(index)
-    }, 2500)})(req.query.length)
+    }, 10000)})(req.query.length)
     res.send('starting')
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)
@@ -75,9 +75,9 @@ exports.getQueueLength = async (req, res) => {
     const payload = {
       method: 'GET',
       json: true,
-      uri: `${process.env.SCRAPER_URL}/count?name=${req.query.queue}`
+      uri: `${process.env.SCRAPER_URL}/count?name=${req.params.queue}`
     }
-    const response = request.do(payload)
+    const response = await request.do(payload)
     res.json(response).status(200)
   } catch (error) {
     logger.error(`failed to get queue length`)
