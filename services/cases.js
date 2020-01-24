@@ -103,7 +103,68 @@ class CaseService {
           }
         }
       },
-      last_pending_doc: { $arrayElemAt: [ '$pending_docs', 0]},
+      last_docs_book_1: {
+        $let: {
+          vars: {
+            book: { $arrayElemAt: [ '$pending_docs', 0 ]},
+          },
+          in: {
+            $let: {
+              vars: {
+                splitted_dates: { $map: {
+                    input: '$$book.docs',
+                    as: 'ex',
+                    in: { $split: [{ $arrayElemAt: [{ $split: ['$$ex.date_added', ' ' ]}, 0]}, '/'] }
+                  }
+                }
+              },
+              in: { $map: {
+                  input: '$$splitted_dates',
+                  as: 'rd',
+                  in: { $dateFromString: {
+                      dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      format: '%d-%m-%Y',
+                      onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      onNull: ''
+                    } 
+                  }
+                }
+              } 
+            }
+          }
+        }
+      },
+      last_docs_book_2: {
+        $let: {
+          vars: {
+            book: { $arrayElemAt: [ '$pending_docs', 1 ]},
+          },
+          in: {
+            $let: {
+              vars: {
+                splitted_dates: { $map: {
+                    input: '$$book.docs',
+                    as: 'ex',
+                    in: { $split: [{ $arrayElemAt: [{ $split: ['$$ex.date_added', ' ' ]}, 0]}, '/'] }
+                  }
+                }
+              },
+              in: { $map: {
+                  input: '$$splitted_dates',
+                  as: 'rd',
+                  in: { $dateFromString: {
+                      dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      format: '%d-%m-%Y',
+                      onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      onNull: ''
+                    } 
+                  }
+                }
+              } 
+            }
+          }
+        }
+      },
       exhorts_added_date: {
         $let: {
           vars: {
@@ -204,6 +265,8 @@ class CaseService {
       rep['last_reception'] = (!rep['last_reception'] ? [] : rep['last_reception'].sort(this.sortDates).slice(-1))
       rep['book_1'] = (!rep['book_1'] ? [] : rep['book_1'].sort(this.sortDates).slice(-1))
       rep['book_2'] = (!rep['book_2'] ? [] : rep['book_2'].sort(this.sortDates).slice(-1))
+      rep['last_docs_book_1'] = (!rep['last_docs_book_1'] ? [] : rep['last_docs_book_1'].sort(this.sortDates).slice(-1))
+      rep['last_docs_book_2'] = (!rep['last_docs_book_2'] ? [] : rep['last_docs_book_2'].sort(this.sortDates).slice(-1))
       return rep
     })
   }
@@ -223,6 +286,8 @@ class CaseService {
       rep['last_reception'] = (!rep['last_reception'] ? [] : rep['last_reception'].sort(this.sortDates).slice(-1))
       rep['book_1'] = (!rep['book_1'] ? [] : rep['book_1'].sort(this.sortDates).slice(-1))
       rep['book_2'] = (!rep['book_2'] ? [] : rep['book_2'].sort(this.sortDates).slice(-1))
+      rep['last_docs_book_1'] = (!rep['last_docs_book_1'] ? [] : rep['last_docs_book_1'].sort(this.sortDates).slice(-1))
+      rep['last_docs_book_2'] = (!rep['last_docs_book_2'] ? [] : rep['last_docs_book_2'].sort(this.sortDates).slice(-1))
       return rep
     })
 
@@ -234,7 +299,7 @@ class CaseService {
   }
 
   async update(query, edit) {
-    return await this.cases.updateOne(query, edit)
+    return await this.cases.updateOne(query, { $set: edit })
   }
 
   async insertMany(items) {

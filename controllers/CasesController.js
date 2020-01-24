@@ -44,7 +44,7 @@ exports.deleteCaseByRole = async (req, res) => {
 
 exports.compare = async(req, res, next) => {
   try {
-    let [storedVersion] = await CaseService.requestCase(req.params.role)
+    let [storedVersion] = await CaseService.search({ role: req.params.role})
     const casesComparisson = CaseService.compareCases(storedVersion, req.body)
     
     if(!casesComparisson.hasChanged) {
@@ -64,10 +64,12 @@ exports.compare = async(req, res, next) => {
 
 exports.update = async (req, res) => {
   try {
-    let storedVersion = CaseService.buildPayload(res.locals.storedVersion, req)
-    await storedVersion.save()
+    console.log(req.body)
+    const newData = CaseService.buildPayload(res.locals.storedVersion, req)
+    const updatedCase = await CaseService.update({ role: req.params.role }, newData)
+
     logger.info(`${req.params.role} saved`)
-    res.json(storedVersion).status(204)
+    res.json(updatedCase).status(204)
     return 
   } catch (error) {
     logger.info(`failed saving the cause ${error}`)
