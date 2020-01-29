@@ -372,6 +372,16 @@ class CaseService {
     return await this.cases.insertMany(items)
   }
 
+  async aggregateByClient(client) {
+    const roles = await this.cases.aggregate([
+      {
+        $match: { 'clients.external_id': client }
+      },
+      this.reportAggregation
+    ])
+    return this.applySort(roles)
+  }
+
   async getAllActiveRoles() {
     const allRoles = await this.cases.aggregate([
       {

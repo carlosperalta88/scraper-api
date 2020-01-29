@@ -35,7 +35,7 @@ const addCasesPayloadBuilder = (cases) => {
 
 exports.addManyRolesToScraperQueue = async (req, res) => {
   try {
-    const casesToAdd = await findAllActiveRoles()
+    const casesToAdd = await findRolesByClient(req.params.client)
     const response = await request.do(addCasesPayloadBuilder(casesToAdd))
     res.status(response.code).json(response)
   } catch (e) {
@@ -47,6 +47,10 @@ exports.addManyRolesToScraperQueue = async (req, res) => {
 const findAllActiveRoles = async () => {
   const cases = await Case.find({ is_active: true })
   return cases
+}
+
+const findRolesByClient = async (client) => {
+  return await Case.find({ 'clients.external_id': client })
 }
 
 exports.executeScraper = async (req, res) => {

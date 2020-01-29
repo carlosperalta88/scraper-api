@@ -80,7 +80,7 @@ exports.update = async (req, res) => {
 
 exports.buildReport = async (req, res) => {
   try {
-    const data = await CaseService.getAllActiveRoles()
+    const data = await CaseService.aggregateByClient(req.params.client)
     const payload = {
       json: true,
       uri: `${process.env.REPORT_URL}/generate`,
