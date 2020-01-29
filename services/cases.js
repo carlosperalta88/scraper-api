@@ -1,12 +1,16 @@
 const Cases = require('../models/Cases')
 const Courts = require('../models/Courts')
 const Notifications = require('../services/notifications')
+const Clients = require('../services/clients')
+const Users = require('../services/users')
 const logger = require('../config/winston')
 
 class CaseService {
   constructor() {
     this.cases = Cases
     this.courts = Courts
+    this.clients = Clients
+    this.users = Users
     this.logger = logger
     this.notifications = Notifications
     this.reportAggregation = { 
@@ -103,6 +107,37 @@ class CaseService {
           }
         }
       },
+      book_3: {
+        $let: {
+          vars: {
+            book: { $arrayElemAt: [ '$cause_history', 2 ]},
+          },
+          in: {
+            $let: {
+              vars: {
+                splitted_dates: { $map: {
+                    input: '$$book.history',
+                    as: 'ex',
+                    in: { $split: [{ $arrayElemAt: [{ $split: ['$$ex.procedure_date', ' ' ]}, 0]}, '/'] }
+                  }
+                }
+              },
+              in: { $map: {
+                  input: '$$splitted_dates',
+                  as: 'rd',
+                  in: { $dateFromString: {
+                      dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      format: '%d-%m-%Y',
+                      onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      onNull: ''
+                    } 
+                  }
+                }
+              } 
+            }
+          }
+        }
+      },
       last_docs_book_1: {
         $let: {
           vars: {
@@ -138,6 +173,37 @@ class CaseService {
         $let: {
           vars: {
             book: { $arrayElemAt: [ '$pending_docs', 1 ]},
+          },
+          in: {
+            $let: {
+              vars: {
+                splitted_dates: { $map: {
+                    input: '$$book.docs',
+                    as: 'ex',
+                    in: { $split: [{ $arrayElemAt: [{ $split: ['$$ex.date_added', ' ' ]}, 0]}, '/'] }
+                  }
+                }
+              },
+              in: { $map: {
+                  input: '$$splitted_dates',
+                  as: 'rd',
+                  in: { $dateFromString: {
+                      dateString: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      format: '%d-%m-%Y',
+                      onError: { $concat: [{ $arrayElemAt: [ '$$rd', 0] }, '-', { $arrayElemAt: [ '$$rd', 1] }, '-', { $arrayElemAt: [ '$$rd', 2] }] },
+                      onNull: ''
+                    } 
+                  }
+                }
+              } 
+            }
+          }
+        }
+      },
+      last_docs_book_3: {
+        $let: {
+          vars: {
+            book: { $arrayElemAt: [ '$pending_docs', 2 ]},
           },
           in: {
             $let: {
@@ -319,6 +385,11 @@ class CaseService {
   async search(query) {
     return await this.cases.find(query)
   }
+
+  async updateZScases() {
+    const clients = await this.clients.get('0')
+    return await this.cases.updateMany({ users: { $size: 0 } }, { $set: { clients: clients } })
+  }
   
   formatScraperResponse(scraperResponse) {
     try {
@@ -364,18 +435,24 @@ class CaseService {
     return { hasChanged: comparisson, diff }
   }
   
-  async caseCreator(role, court_id, external_id) {
+  async caseCreator(body) {
     let court
+    let users
+    let clients
     try {
-      court = await this.courts.find({ external_id: court_id })
+      court = await this.courts.find({ external_id: body.court_id })
+      users = await this.users.search({ email: { $in: body.emails } })
+      clients = await this.clients.search({ external_id: { $in: body.client_external_ids } })
     } catch (error) {
       this.logger.info(error)
       throw new Error(error)
     }
     return new Cases({
-      role: role,
+      role: body.role,
       court: court[0],
-      external_id: external_id,
+      external_id: body.external_id,
+      clients: clients,
+      users: users,
       is_active: true
     })
   }

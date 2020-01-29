@@ -1,5 +1,7 @@
 var mongoose = require('mongoose')
 var CourtSchema = require('../models/Courts')
+var UsersSchema = require('../models/Users')
+var ClientSchema = require('../models/Clients')
 var Schema = mongoose.Schema
 
 var CasesSchema = new Schema({
@@ -13,7 +15,8 @@ var CasesSchema = new Schema({
   "pending_docs": [],
   "cause_history": [],
   "exhorts": [],
-  "users": [],
+  "users": [{ type: UsersSchema.schema }],
+  "clients": [{ type: ClientSchema.schema }],
   "is_active": Boolean
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
