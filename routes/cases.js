@@ -2,7 +2,6 @@ var express = require('express')
 var router = express.Router()
 var casesController = require('../controllers/CasesController')
 
-router.get('/backfill', casesController.backfillZS)
 router.post('/add', casesController.addCase)
 router.post('/bulk/add', casesController.addCases)
 router.get('/report', casesController.buildReport)

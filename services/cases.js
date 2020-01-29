@@ -385,11 +385,6 @@ class CaseService {
   async search(query) {
     return await this.cases.find(query)
   }
-
-  async updateZScases() {
-    const clients = await this.clients.get('0')
-    return await this.cases.updateMany({ users: { $size: 0 } }, { $set: { clients: clients } })
-  }
   
   formatScraperResponse(scraperResponse) {
     try {
@@ -442,9 +437,9 @@ class CaseService {
     try {
       court = await this.courts.find({ external_id: body.court_id })
       users = await this.users.search({ email: { $in: body.emails } })
-      clients = await this.clients.search({ external_id: { $in: body.client_external_ids } })
+      clients = await this.clients.search({ external_id: { $in: body.clients } })
     } catch (error) {
-      this.logger.info(error)
+      this.logger.info(error, body)
       throw new Error(error)
     }
     return new Cases({

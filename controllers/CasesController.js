@@ -14,7 +14,7 @@ exports.addCase = async (req, res) => {
 }
 
 exports.addCases = async (req, res) => {
-  Promise.all(req.body.cases.map(async item => CaseService.caseCreator(body)))
+  Promise.all(req.body.cases.map(async item => CaseService.caseCreator(item)))
     .then(async (items) => {  
       await CaseService.insertMany(items)
       res.status(201).json(items)
@@ -92,18 +92,6 @@ exports.buildReport = async (req, res) => {
     res.json(response)
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)
-    res.send(error).status(500)
-  }
-}
-
-
-exports.backfillZS = async (req, res) => {
-  try {
-    const data = await CaseService.updateZScases()
-    res.json(data).status(200)
-  } catch (error) {
-    console.log(error)
-    logger.error(error)
     res.send(error).status(500)
   }
 }
