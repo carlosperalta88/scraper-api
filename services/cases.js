@@ -419,8 +419,7 @@ class CaseService {
     }
   }
   
-  compareCases(storedVersion, scraperResponse) {
-    const scraperResponseFormatted = this.formatScraperResponse(scraperResponse)
+  compareCases(storedVersion, scraperResponseFormatted) {
     let diff = []
     const comparisson = Object.keys(scraperResponseFormatted).map((el) => {
       if(!storedVersion.hasOwnProperty(el)) return false
