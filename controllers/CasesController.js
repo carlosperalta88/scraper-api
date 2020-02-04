@@ -64,9 +64,8 @@ exports.compare = async(req, res, next) => {
 
 exports.update = async (req, res) => {
   try {
-    console.log(req.body)
     const newData = CaseService.buildPayload(res.locals.storedVersion, req)
-    const updatedCase = await CaseService.update({ role: req.params.role }, newData)
+    const updatedCase = await CaseService.update({ $and: [{ role: req.params.role }, { 'court.name': newData['court']['name'] }] }, newData)
 
     logger.info(`${req.params.role} saved`)
     res.json(updatedCase).status(204)
