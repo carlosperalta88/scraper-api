@@ -32,9 +32,9 @@ exports.getCaseByRole = async (req, res) => {
   }
 }
 
-exports.deleteCaseByRole = async (req, res) => {
+exports.deleteCaseByRoleAndCourt = async (req, res) => {
   try {
-    const query = await CaseService.deleteOne(req.params.role)
+    const query = await CaseService.deleteOne(req.params.role, req.body.court_id)
     res.json(query)
   } catch (error) {
     logger.info(error)
@@ -66,7 +66,6 @@ exports.compare = async(req, res, next) => {
 exports.update = async (req, res) => {
   try {
     const newData = CaseService.buildPayload(res.locals.storedVersion, req)
-    console.log(newData['court']['name'])
     const updatedCase = await CaseService.update({ $and: [{ role: req.params.role }, { 'court.name': newData['court']['name'] }] }, newData)
 
     logger.info(`${req.params.role} saved`)
