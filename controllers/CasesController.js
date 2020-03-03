@@ -42,32 +42,19 @@ exports.deleteCaseByRoleAndCourt = async (req, res) => {
   }
 }
 
-exports.compare = async(req, res, next) => {
+exports.deleteManyCasesByExternalId = async (req, res) => {
   try {
-    const incomingRoleData = CaseService.formatScraperResponse(req.body)
-    let [storedVersion] = await CaseService.search({ $and: [{ role: req.params.role }, { 'court.name': incomingRoleData['court'] } ]})
-    const casesComparisson = CaseService.compareCases(storedVersion, req.body)
-    
-    if(!casesComparisson.hasChanged) {
-      logger.info(`no need to update ${req.params.role}`)
-      res.send(`Nothing to update, entity ${req.params.role} has not changed`).status(200)
-      return
-    }
-
-    res.locals.storedVersion = storedVersion
-    res.locals.caseDiff = casesComparisson.diff
-    next()
+    const query = await CaseService.deleteMany(req.body.external_ids)
+    res.json(query)
   } catch (error) {
-    logger.error(`failed formatting the cause ${error}`)
-    res.send(error).status(500)
+    logger.info(error)
+    res.send(error)
   }
 }
 
 exports.update = async (req, res) => {
   try {
-    const newData = CaseService.buildPayload(res.locals.storedVersion, req)
-    const updatedCase = await CaseService.update({ $and: [{ role: req.params.role }, { 'court.name': newData['court']['name'] }] }, newData)
-
+    const updatedCase = await CaseService.updateCase(req)
     logger.info(`${req.params.role} saved`)
     res.json(updatedCase).status(204)
     return 
