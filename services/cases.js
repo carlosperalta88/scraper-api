@@ -1,7 +1,7 @@
-const Cases = require('../models/Cases')
-const CasesData = require('../models/CasesData')
-const logger = require('../config/winston')
-const Reports = require('../models/Reports')
+import Cases from '../models/Cases'
+import CasesData from '../models/CasesData'
+import logger from '../config/winston'
+import Reports from '../models/Reports'
 
 class CaseService {
   constructor(Cases, logger, CasesData, Reports) {
@@ -94,7 +94,7 @@ class CaseService {
   }
 
   async deleteMany(roles) {
-    return await this.cases.deleteMany(roles)
+    return await this.cases.deleteManyByExternalId(roles)
   }
 
 }

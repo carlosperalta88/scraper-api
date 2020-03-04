@@ -1,9 +1,10 @@
-var mongoose = require('mongoose')
-var CourtSchema = require('../models/Courts')
-var UsersSchema = require('../models/Users')
-var ClientSchema = require('../models/Clients')
-var CasesData = require('../models/CasesData')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+import CourtSchema from '../models/Courts'
+import UsersSchema from '../models/Users'
+import ClientSchema from '../models/Clients'
+import CasesData from '../models/CasesData'
+
+let Schema = mongoose.Schema
 
 var CasesSchema = new Schema({
   "court": { type: CourtSchema.schema, required: true, unique: false },
@@ -18,35 +19,35 @@ CasesSchema.index({
   role: 'text'
 })
 
-CasesSchema.static.deleteOne = async (role, court) => {
-  return await Cases.updateOne({ $and: [{ role: role }, { 'court.external_id': court }] }, { is_active: false })
+CasesSchema.statics.deleteOne = function (role, court) {
+  return this.updateOne({ $and: [{ role: role }, { 'court.external_id': court }] }, { is_active: false })
 }
 
-CasesSchema.static.deleteMany = async (roles = []) => {
-  return await Cases.updateMany({ external_id: { $in: roles } }, { $set: { is_active: false } })
+CasesSchema.statics.deleteManyByExternalId = function(roles) {
+  return this.updateMany({ external_id: { $in: roles } }, { $set: { is_active: false } })
 }
 
-CasesSchema.static.update = async (query, edit) => {
-  return await Cases.updateOne(query, { $set: edit })
+CasesSchema.statics.update = function (query, edit) {
+  return this.updateOne(query, { $set: edit })
 }
 
-CasesSchema.static.updateCaseData = async (query, data) => {
-  return await Cases.updateOne(query, { $push: data })
+CasesSchema.statics.updateCaseData = function (query, data) {
+  return this.updateOne(query, { $push: data })
 }
 
-CasesSchema.static.insertMany = async (items) => {
-  return await Cases.insertMany(items)
+CasesSchema.statics.insertMany = function (items) {
+  return this.insertMany(items)
 }
 
-CasesSchema.static.caseCreator = async (body) => {
+CasesSchema.statics.caseCreator = function (body) {
   let court
   let users
   let clients
 
   try {
-    court = await CourtSchema.find({ external_id: body.court_id })
-    users = [ await UsersSchema.search({ email: { $in: body.emails } })[0]._id ]
-    clients = [ await ClientSchema.search({ external_id: { $in: body.clients } })[0]._id ]
+    court = CourtSchema.find({ external_id: body.court_id })
+    users = [ UsersSchema.search({ email: { $in: body.emails } })[0]._id ]
+    clients = [ ClientSchema.search({ external_id: { $in: body.clients } })[0]._id ]
   } catch (error) {
     throw new Error(error)
   }
@@ -68,17 +69,16 @@ CasesSchema.virtual('case', {
   options: { sort: { created_at: -1 }, limit: 1 }
 })
 
-CasesSchema.static.getCasesByClient = async (clients) => {
-  return await Cases.find({ clients: { $all: clients } }).populate('case').exec()
+CasesSchema.statics.getCasesByClient = function (clients) {
+  return this.find({ clients: { $all: clients } }).populate('case').exec()
 }
 
-CasesSchema.static.getCasesByExternalId = async (external_id) => {
-  return await Cases.find({ external_id }).populate('case').exec()
+CasesSchema.statics.getCasesByExternalId = function (external_id) {
+  return this.find({ external_id }).populate('case').exec()
 }
 
-CasesSchema.static.search = async (query) => {
-  return await Cases.find(query).populate('case').exec()
+CasesSchema.statics.search = function (query) {
+  return this.find(query).populate('case').exec()
 }
 
-const Cases = mongoose.model('Cases', CasesSchema)
-export default Cases
+export default mongoose.model('Cases', CasesSchema)

@@ -1,4 +1,4 @@
-import Cases from './Cases'
+import Cases from '../models/Cases'
 import mongoose from 'mongoose'
 let Schema = mongoose.Schema
 
@@ -13,7 +13,7 @@ let CasesDataSchema = new Schema({
   "exhorts": [],
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-CasesDataSchema.static.add = async (role, court, payload) => {
+CasesDataSchema.statics.add = async (role, court, payload) => {
   let [parent_case] = await Cases.find({ $and: [{ role: role }, { 'court.name': court }] })
   payload['case_id'] = parent_case._id
 

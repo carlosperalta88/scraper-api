@@ -1,5 +1,5 @@
-const logger = require('../config/winston')
-const request = require('../lib/api')
+import logger from '../config/winston'
+import request from '../lib/api'
 import CaseService from '../services/cases'
 
 exports.addCase = async (req, res) => {
@@ -47,8 +47,8 @@ exports.deleteManyCasesByExternalId = async (req, res) => {
     const query = await CaseService.deleteMany(req.body.external_ids)
     res.json(query)
   } catch (error) {
-    logger.info(error)
-    res.send(error)
+    logger.info(`fail ${error}`)
+    res.send(error).status(500)
   }
 }
 

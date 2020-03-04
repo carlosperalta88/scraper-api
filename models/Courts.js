@@ -1,9 +1,9 @@
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+let Schema = mongoose.Schema
 
-var CourtsSchema = new Schema({
+let CourtsSchema = new Schema({
   name: { type: String, required: true },
   external_id: Number
 })
 
-module.exports = mongoose.model('Courts', CourtsSchema)
+export default mongoose.model('Courts', CourtsSchema)

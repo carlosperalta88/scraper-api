@@ -1,9 +1,9 @@
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
-var Clients = require('../models/Clients')
-var Roles = require('../models/Roles')
+import mongoose from 'mongoose'
+let Schema = mongoose.Schema
+import Clients from '../models/Clients'
+import Roles from '../models/Roles'
 
-var UsersSchema = new Schema({
+let UsersSchema = new Schema({
   email: { type: String, required: true },
   client: { type: Clients.schema, required: true, unique: false },
   role: { type: Roles.schema, required: true, unique: false},
@@ -12,11 +12,11 @@ var UsersSchema = new Schema({
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
 
-UsersSchema.static.get = async (email) => {
+UsersSchema.statics.get = async (email) => {
   return await Users.find({ email })
 }
 
-UsersSchema.static.add = async (body) => {
+UsersSchema.statics.add = async (body) => {
   let role
   let client
   try {
@@ -34,15 +34,15 @@ UsersSchema.static.add = async (body) => {
   return user
 }
 
-UsersSchema.static.search = async (body) => {
+UsersSchema.statics.search = async (body) => {
   return await Users.find(body)
 }
 
-UsersSchema.static.delete = async (email) => {
+UsersSchema.statics.delete = async (email) => {
   return await Users.updateOne({ email: email }, { $set: { is_active: false } })
 }
 
-UsersSchema.static.update = async (email, body) => {
+UsersSchema.statics.update = async (email, body) => {
   return await Users.updateOne({ email }, { $set: body })
 }
 

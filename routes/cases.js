@@ -5,9 +5,9 @@ var casesController = require('../controllers/CasesController')
 router.post('/add', casesController.addCase)
 router.post('/bulk/add', casesController.addCases)
 router.get('/reports/:client', casesController.buildReport)
+router.delete('/deactivate', casesController.deleteManyCasesByExternalId)
 router.get('/:role', casesController.getCaseByRole)
 router.delete('/:role/deactivate', casesController.deleteCaseByRoleAndCourt)
-router.delete('/deactivate', casesController.deleteManyCasesByExternalId)
 router.patch('/:role/update', casesController.update)
 
 module.exports = router

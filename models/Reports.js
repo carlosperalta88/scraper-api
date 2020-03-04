@@ -8,13 +8,11 @@ let ReportsSchema = new Schema({
   data: []
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-ReportsSchema.static.create = async (client, data) => {
+ReportsSchema.statics.create = async (client, data) => {
   return await new Reports({ client, data }).save()
 }
-// create a schema to store the aggregation, get that object id and relate it to this report schema and serve it as a virtual 
 
-// flatten the case object to match the reportAggregation schema first
-ReportsSchema.static.build = async (client)  => {
+ReportsSchema.statics.build = async (client)  => {
   return await Cases.aggregate([
     {
       $match: { 'clients.external_id': client }
