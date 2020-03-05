@@ -12,11 +12,11 @@ let UsersSchema = new Schema({
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
 
-UsersSchema.statics.get = async (email) => {
-  return await Users.find({ email })
+UsersSchema.statics.get = function(email) {
+  return await this.find({ email })
 }
 
-UsersSchema.statics.add = async (body) => {
+UsersSchema.statics.add = function(body) {
   let role
   let client
   try {
@@ -29,24 +29,20 @@ UsersSchema.statics.add = async (body) => {
   let newUser = JSON.parse(JSON.stringify(body))
   newUser['role'] = role[0]
   newUser['client'] = client[0]
-  const user = new this.users(newUser)
-  await user.save()
-  return user
+  return await new Users(newUser).save()
 }
 
-UsersSchema.statics.search = async (body) => {
-  return await Users.find(body)
+UsersSchema.statics.search = function(query) {
+  return await this.find(query)
 }
 
-UsersSchema.statics.delete = async (email) => {
-  return await Users.updateOne({ email: email }, { $set: { is_active: false } })
+UsersSchema.statics.delete = function(email) {
+  return await this.updateOne({ email: email }, { $set: { is_active: false } })
 }
 
-UsersSchema.statics.update = async (email, body) => {
-  return await Users.updateOne({ email }, { $set: body })
+UsersSchema.statics.update = function(email, body) {
+  return await this.updateOne({ email }, { $set: body })
 }
-
 
 const Users = mongoose.model('Users', UsersSchema)
-
 export default Users

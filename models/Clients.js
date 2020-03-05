@@ -7,24 +7,24 @@ let ClientsSchema = new Schema({
   is_active: Boolean
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-ClientsSchema.statics.get = async (external_id) => {
-  return await Clients.find({ external_id })
+ClientsSchema.statics.get = function(external_id) {
+  return await this.find({ external_id })
 }
 
-ClientsSchema.statics.add = async (body) => {
+ClientsSchema.statics.add = function(body) {
   return await new Clients(body).save()
 }
 
-ClientsSchema.statics.search = async (body) => {
-  return await Clients.find(body)
+ClientsSchema.statics.search = function(body) {
+  return await this.find(body)
 }
 
-ClientsSchema.statics.delete = async (external_id) => {
-  return await Clients.updateOne({ external_id: external_id }, { $set: { is_active: false } })
+ClientsSchema.statics.delete = function(external_id) {
+  return await this.updateOne({ external_id: external_id }, { $set: { is_active: false } })
 }
 
-ClientsSchema.statics.update = async (external_id, body) => {
-  return await Clients.updateOne({ external_id }, { $set: body })
+ClientsSchema.statics.update = function(external_id, body) {
+  return await this.updateOne({ external_id }, { $set: body })
 }
 
 const Clients = mongoose.model('Clients', ClientsSchema)

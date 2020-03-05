@@ -1,5 +1,5 @@
-const logger = require('../config/winston')
-const roleService = require('../services/roles')
+import logger from '../config/winston'
+import roleService from '../services/roles'
 
 exports.get = async (req, res) => {
   try {

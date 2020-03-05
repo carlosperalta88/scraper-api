@@ -13,22 +13,22 @@ exports.addCase = async (req, res) => {
 }
 
 exports.addCases = async (req, res) => {
-  //fix this one
-  Promise.all(req.body.cases.map(async item => CaseService.caseCreator(item)))
-    .then(async (items) => {  
-      await CaseService.insertMany(items)
-      res.status(201).json(items)
-    }).catch((e) => res.status(500).send({ error: e.name, message: e.message }))
+  try {
+    const cases = await CaseService.addManyCases(req.body.cases)
+    res.json(cases).status(202)
+  } catch (error) {
+    logger.info(error)
+    res.send(error).status(500)
+  }
 }
 
-exports.getCaseByRole = async (req, res) => {
+exports.searchCases = async (req, res) => {
   try {
-    const reqCase = await CaseService.requestCase(req.params.role)
-    res.json(reqCase)
+    const search = await CaseService.search(req.body.search)
+    res.json(search).status(200)
   } catch (error) {
-    console.log(error)
     logger.info(error)
-    res.status(500).send(error)
+    res.send(error).status(500)
   }
 }
 

@@ -1,56 +1,15 @@
 // role*court_name
-const Case = require('../models/Cases')
-const request = require('../lib/api')
-const logger = require('../config/winston')
+import logger from '../config/winston'
+import ScraperService from '../services/scraper'
 
-exports.addRoleToScraperQueue = async (req, res) => {
+exports.addToScraperQueue = async (req, res) => {
   try {
-    const caseToAdd = await findByRoleAndCourt(req.params.role, req.params.court)
-    const response = await request.do(addCasesPayloadBuilder(caseToAdd))
-    res.json(response)
-  } catch (e) {
-    logger.error(`couldn't add role to queue ${e}`)
-    res.status(500).send({ ...e })
-  }
-}
-
-const findByRoleAndCourt = async (role, court) => {
-  const r = await Case.find({ role, "court.external_id": court })
-  return r
-}
-
-const bodyBuild = (item) => {
-  return encodeURI(`${item['role']}*${item['court']['name']}`)
-}
-
-const addCasesPayloadBuilder = (cases) => {
-  return {
-    json: true,
-    uri: `${process.env.SCRAPER_URL}/add`,
-    method: 'POST',
-    body: {
-      roles: cases.map(el => bodyBuild(el))
-    }}
-}
-
-exports.addManyRolesToScraperQueue = async (req, res) => {
-  try {
-    const casesToAdd = await findRolesByClient(req.params.client)
-    const response = await request.do(addCasesPayloadBuilder(casesToAdd))
-    res.status(response.code).json(response)
+    const cases = await ScraperService.addToScraperQueue(req.body.query)
+    res.json(cases).status(cases.code)
   } catch (e) {
     logger.error(`couldn't add roles to queue ${e}`)
-    res.status(500).json({error: e.toString()})
+    res.status(500).send({ ...e })
   }
-}
-
-const findAllActiveRoles = async () => {
-  const cases = await Case.find({ is_active: true })
-  return cases
-}
-
-const findRolesByClient = async (client) => {
-  return await Case.find({ $and: [{'clients.external_id': client }, { is_active: true }] })
 }
 
 exports.executeScraper = async (req, res) => {
@@ -76,12 +35,7 @@ exports.executeScraper = async (req, res) => {
 
 exports.getQueueLength = async (req, res) => {
   try {
-    const payload = {
-      method: 'GET',
-      json: true,
-      uri: `${process.env.SCRAPER_URL}/count?name=${req.params.queue}`
-    }
-    const response = await request.do(payload)
+    const response = await ScraperService.getQueueLength(req.params.queue)
     res.json(response).status(200)
   } catch (error) {
     logger.error(`failed to get queue length`)

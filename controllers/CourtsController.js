@@ -1,21 +1,9 @@
-const Courts = require('../models/Courts')
-const logger = require('../config/winston')
-
-exports.addCourt = async (req, res) => {
-  const court = new Courts({ name: req.body.name, external_id: req.body.external_id })
-  try {
-    await court.save()
-    return res.status(201).json(court) 
-  } catch (error) {
-    logger.error(error)
-    return res.status(500).send(error)
-  }
-}
+import CourtsService from '../services/courts'
+import logger from '../config/winston'
 
 exports.addCourts = async (req, res) => {
-  const courts = req.body.map((el) => new Courts({ name: el.name, external_id: el.external_id }))
   try {
-    await Courts.insertMany(courts)
+    const courts = await CourtsService.add(req.body.courts)
     return res.status(201).json(courts)
   } catch (error) {
     logger.error(error)
@@ -23,9 +11,9 @@ exports.addCourts = async (req, res) => {
   }
 }
 
-exports.getCourt = async (req, res) => {
+exports.getCourts = async (req, res) => {
   try {
-    const court = await Courts.find({ external_id: req.params.id }, {})
+    const court = await CourtsService.search(req.body.query)
     return res.status(200).json(court)
   } catch (error) {
     logger.error(error)

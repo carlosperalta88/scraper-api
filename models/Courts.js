@@ -6,4 +6,13 @@ let CourtsSchema = new Schema({
   external_id: Number
 })
 
-export default mongoose.model('Courts', CourtsSchema)
+CourtsSchema.statics.add = function(courts) {
+  return await this.insertMany(courts)
+}
+
+CourtsSchema.statics.search = function(query) {
+  return await this.find(query)
+}
+
+const Courts = mongoose.model('Courts', CourtsSchema)
+export default Courts

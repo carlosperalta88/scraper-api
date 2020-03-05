@@ -13,7 +13,7 @@ var CasesSchema = new Schema({
   "users": [{ type: mongoose.Schema.ObjectId, ref: 'Users' }],
   "clients": [{ type: mongoose.Schema.ObjectId, ref: 'Clients' }],
   "is_active": Boolean
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }, toJSON: { virtuals: true }})
 
 CasesSchema.index({
   role: 'text'
@@ -45,7 +45,7 @@ CasesSchema.statics.caseCreator = function (body) {
   let clients
 
   try {
-    court = CourtSchema.find({ external_id: body.court_id })
+    court = CourtSchema.search({ external_id: body.court_id })
     users = [ UsersSchema.search({ email: { $in: body.emails } })[0]._id ]
     clients = [ ClientSchema.search({ external_id: { $in: body.clients } })[0]._id ]
   } catch (error) {
@@ -81,4 +81,5 @@ CasesSchema.statics.search = function (query) {
   return this.find(query).populate('case').exec()
 }
 
-export default mongoose.model('Cases', CasesSchema)
+const Cases = mongoose.model('Cases', CasesSchema)
+export default Cases

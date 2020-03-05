@@ -1,8 +1,17 @@
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+let Schema = mongoose.Schema
 
-var RolesSchema = new Schema({
+let RolesSchema = new Schema({
   name: { type: String, required: true }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-module.exports = mongoose.model('Roles', RolesSchema)
+RolesSchema.statics.add = function(body) {
+  return await new Roles(body).save()
+}
+
+RolesSchema.statics.get = function(name) {
+  return await this.find(name)
+}
+
+const Roles = mongoose.model('Roles', RolesSchema)
+export default Roles

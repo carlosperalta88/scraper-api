@@ -46,6 +46,10 @@ class CaseService {
     return await this.cases.caseCreator(data)
   }
 
+  async addManyCases(cases) {
+    return await this.cases.insertMany(cases)
+  }
+
   formatScraperResponse(req) {
     try {
       const modelKeys = ['court','cover','role','document_status','receptor','pending_docs','cause_history','exhorts']
@@ -89,6 +93,10 @@ class CaseService {
 
   async deleteMany(roles) {
     return await this.cases.deleteManyByExternalId(roles)
+  }
+
+  async search(query) {
+    return await this.cases.search(query)
   }
 
 }

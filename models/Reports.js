@@ -8,11 +8,11 @@ let ReportsSchema = new Schema({
   data: []
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-ReportsSchema.statics.create = async (client, data) => {
+ReportsSchema.statics.create = function(client, data) {
   return await new Reports({ client, data }).save()
 }
 
-ReportsSchema.statics.build = async (client)  => {
+ReportsSchema.statics.build = function(client) {
   return await Cases.aggregate([
     {
       $match: { 'clients.external_id': client }
