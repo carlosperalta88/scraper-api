@@ -5,7 +5,6 @@ import CaseService from '../services/cases'
 exports.addCase = async (req, res) => {
   try {
     const newCase = await CaseService.caseCreator(req.body)
-    await newCase.save()
     res.status(201).json(newCase)
   } catch (error) {
     logger.info(error)
@@ -14,6 +13,7 @@ exports.addCase = async (req, res) => {
 }
 
 exports.addCases = async (req, res) => {
+  //fix this one
   Promise.all(req.body.cases.map(async item => CaseService.caseCreator(item)))
     .then(async (items) => {  
       await CaseService.insertMany(items)

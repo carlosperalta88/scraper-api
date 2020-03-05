@@ -42,15 +42,9 @@ class CaseService {
     return this.applySort(roles)
   }
 
-  // async getAllActiveRoles() {
-  //   const allRoles = await this.cases.aggregate([
-  //     {
-  //       $match: { is_active: true }
-  //     },
-  //     this.reportAggregation
-  //   ])
-  //   return this.applySort(allRoles)
-  // }
+  async caseCreator(data) {
+    return await this.cases.caseCreator(data)
+  }
 
   formatScraperResponse(req) {
     try {

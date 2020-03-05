@@ -59,7 +59,7 @@ CasesSchema.statics.caseCreator = function (body) {
     clients: clients,
     users: users,
     is_active: true
-  })
+  }).save()
 }
 
 CasesSchema.virtual('case', {

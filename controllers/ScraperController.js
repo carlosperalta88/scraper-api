@@ -50,7 +50,7 @@ const findAllActiveRoles = async () => {
 }
 
 const findRolesByClient = async (client) => {
-  return await Case.find({ 'clients.external_id': client })
+  return await Case.find({ $and: [{'clients.external_id': client }, { is_active: true }] })
 }
 
 exports.executeScraper = async (req, res) => {
