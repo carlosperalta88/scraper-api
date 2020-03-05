@@ -13,7 +13,7 @@ let CasesDataSchema = new Schema({
   "exhorts": [],
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-CasesDataSchema.statics.add = async (role, court, payload) => {
+CasesDataSchema.statics.add = async function(role, court, payload) {
   let [parent_case] = await Cases.find({ $and: [{ role: role }, { 'court.name': court }] })
   payload['case_id'] = parent_case._id
 

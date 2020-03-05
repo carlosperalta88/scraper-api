@@ -39,20 +39,20 @@ CasesSchema.statics.insertMany = function (items) {
   return this.insertMany(items)
 }
 
-CasesSchema.statics.caseCreator = function (body) {
+CasesSchema.statics.caseCreator = async function (body) {
   let court
   let users
   let clients
 
   try {
-    court = CourtSchema.search({ external_id: body.court_id })
-    users = [ UsersSchema.search({ email: { $in: body.emails } })[0]._id ]
-    clients = [ ClientSchema.search({ external_id: { $in: body.clients } })[0]._id ]
+    court = await CourtSchema.search({ external_id: body.court_id })
+    users = [ await UsersSchema.search({ email: { $in: body.emails } })[0]._id ]
+    clients = [ await ClientSchema.search({ external_id: { $in: body.clients } })[0]._id ]
   } catch (error) {
     throw new Error(error)
   }
 
-  return new Cases({
+  return await new Cases({
     role: body.role,
     court: court[0],
     external_id: body.external_id,

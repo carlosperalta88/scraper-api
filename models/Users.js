@@ -13,10 +13,10 @@ let UsersSchema = new Schema({
 
 
 UsersSchema.statics.get = function(email) {
-  return await this.find({ email })
+  return this.find({ email })
 }
 
-UsersSchema.statics.add = function(body) {
+UsersSchema.statics.add = async function(body) {
   let role
   let client
   try {
@@ -33,15 +33,15 @@ UsersSchema.statics.add = function(body) {
 }
 
 UsersSchema.statics.search = function(query) {
-  return await this.find(query)
+  return this.find(query)
 }
 
 UsersSchema.statics.delete = function(email) {
-  return await this.updateOne({ email: email }, { $set: { is_active: false } })
+  return this.updateOne({ email: email }, { $set: { is_active: false } })
 }
 
 UsersSchema.statics.update = function(email, body) {
-  return await this.updateOne({ email }, { $set: body })
+  return this.updateOne({ email }, { $set: body })
 }
 
 const Users = mongoose.model('Users', UsersSchema)

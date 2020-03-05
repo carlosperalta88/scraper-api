@@ -5,12 +5,12 @@ let RolesSchema = new Schema({
   name: { type: String, required: true }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-RolesSchema.statics.add = function(body) {
+RolesSchema.statics.add = async function(body) {
   return await new Roles(body).save()
 }
 
 RolesSchema.statics.get = function(name) {
-  return await this.find(name)
+  return this.find(name)
 }
 
 const Roles = mongoose.model('Roles', RolesSchema)

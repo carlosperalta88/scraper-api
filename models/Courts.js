@@ -7,11 +7,11 @@ let CourtsSchema = new Schema({
 })
 
 CourtsSchema.statics.add = function(courts) {
-  return await this.insertMany(courts)
+  return this.insertMany(courts)
 }
 
 CourtsSchema.statics.search = function(query) {
-  return await this.find(query)
+  return this.find(query)
 }
 
 const Courts = mongoose.model('Courts', CourtsSchema)
