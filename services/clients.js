@@ -5,8 +5,8 @@ class ClientsService {
     this.clients = Clients
   }
 
-  async get(email) {
-    return await this.clients.get(email)
+  async get(external_id) {
+    return await this.clients.get(external_id)
   }
 
   async add(body) {
@@ -17,11 +17,11 @@ class ClientsService {
     return await this.clients.search(query)
   }
 
-  async delete(email) {
-    return await this.clients.delete(email)
+  async delete(external_id) {
+    return await this.clients.delete(external_id)
   }
-  async update(email, body) {
-    return await this.clients.update(email, body)
+  async update(external_id, body) {
+    return await this.clients.update(external_id, body)
   }
 }
 
