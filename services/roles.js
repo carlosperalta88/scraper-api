@@ -6,7 +6,7 @@ class RolesService {
   }
 
   async get(name) {
-    return await this.roles.get({ name })
+    return await this.roles.search({ name })
   }
 
   async add(body) {

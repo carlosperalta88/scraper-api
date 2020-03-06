@@ -9,8 +9,8 @@ RolesSchema.statics.add = async function(body) {
   return await new Roles(body).save()
 }
 
-RolesSchema.statics.get = function(name) {
-  return this.find(name)
+RolesSchema.statics.search = function(body) {
+  return this.find(body)
 }
 
 const Roles = mongoose.model('Roles', RolesSchema)
