@@ -31,36 +31,6 @@ CasesSchema.statics.update = function (query, edit) {
   return this.updateOne(query, { $set: edit })
 }
 
-CasesSchema.statics.updateCaseData = function (query, data) {
-  return this.updateOne(query, { $push: data })
-}
-
-CasesSchema.statics.insertMany = function (items) {
-  return this.insertMany(items)
-}
-
-CasesSchema.statics.caseCreator = async function (body) {
-  let court
-  let users
-  let clients
-
-  try {
-    court = await CourtSchema.search({ external_id: body.court_id })
-    users = [ await UsersSchema.search({ email: { $in: body.emails } })[0]._id ]
-    clients = [ await ClientSchema.search({ external_id: { $in: body.clients } })[0]._id ]
-  } catch (error) {
-    throw new Error(error)
-  }
-
-  return await new Cases({
-    role: body.role,
-    court: court[0],
-    external_id: body.external_id,
-    clients: clients,
-    users: users,
-    is_active: true
-  }).save()
-}
 
 CasesSchema.virtual('case', {
   ref: 'CasesData',
@@ -79,6 +49,11 @@ CasesSchema.statics.getCasesByExternalId = function (external_id) {
 
 CasesSchema.statics.search = function (query) {
   return this.find(query).populate('case').exec()
+}
+
+CasesSchema.statics.insertMany = function (items) {
+  console.log(items)
+  return Cases.insertMany(items)
 }
 
 const Cases = mongoose.model('Cases', CasesSchema)

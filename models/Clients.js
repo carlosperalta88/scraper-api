@@ -19,6 +19,10 @@ ClientsSchema.statics.search = function(body) {
   return this.find(body)
 }
 
+ClientsSchema.statics.getClientsId = function(body) {
+  return this.find(body)
+}
+
 ClientsSchema.statics.delete = function(external_id) {
   return this.updateOne({ external_id: external_id }, { $set: { is_active: false } })
 }

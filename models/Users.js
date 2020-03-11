@@ -17,22 +17,14 @@ UsersSchema.statics.get = function(email) {
 }
 
 UsersSchema.statics.add = async function(body) {
-  let role
-  let client
-  try {
-    role = await Roles.get(body['role'])
-    client = await Clients.get(body['client'])
-  } catch (error) {
-    this.logger.info(error)
-    throw new Error(error)
-  }
-  let newUser = JSON.parse(JSON.stringify(body))
-  newUser['role'] = role[0]
-  newUser['client'] = client[0]
-  return await new Users(newUser).save()
+  return await new Users(body).save()
 }
 
 UsersSchema.statics.search = function(query) {
+  return this.find(query)
+}
+
+UsersSchema.statics.getIdByEmail = function(query) {
   return this.find(query)
 }
 

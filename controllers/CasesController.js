@@ -2,16 +2,6 @@ import logger from '../config/winston'
 import request from '../lib/api'
 import CaseService from '../services/cases'
 
-exports.addCase = async (req, res) => {
-  try {
-    const newCase = await CaseService.caseCreator(req.body)
-    res.status(201).json(newCase)
-  } catch (error) {
-    logger.info(error)
-    res.status(500).send(error)
-  }
-}
-
 exports.addCases = async (req, res) => {
   try {
     const cases = await CaseService.addManyCases(req.body.cases)
@@ -49,19 +39,6 @@ exports.deleteManyCasesByExternalId = async (req, res) => {
   } catch (error) {
     logger.info(`fail ${error}`)
     res.send(error).status(500)
-  }
-}
-
-exports.update = async (req, res) => {
-  try {
-    const updatedCase = await CaseService.updateCase(req)
-    logger.info(`${req.params.role} saved`)
-    res.json(updatedCase).status(204)
-    return 
-  } catch (error) {
-    logger.info(`failed saving the cause ${error}`)
-    res.send(error).status(500)
-    return 
   }
 }
 

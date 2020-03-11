@@ -1,4 +1,6 @@
 import Users from '../models/Users'
+import Clients from '../models/Clients'
+import Roles from '../models/Roles'
 
 class UsersService {
   constructor(Users) {
@@ -10,6 +12,10 @@ class UsersService {
   }
 
   async add(body) {
+    const role = await Roles.search(body['role'])
+    const client = await Clients.search(body['client'])
+    body['role'] = role[0]
+    body['client'] = client[0]
     return await this.users.add(body)
   }
 

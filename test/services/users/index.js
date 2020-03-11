@@ -13,42 +13,61 @@ describe('users service', () => {
   })
 
   it('should create an user', async () => {
-    const client = await UsersService.add({
-      'name': 'Zona Sur',
-      'external_id': '0',
-      'is_active': true
+    const user = await UsersService.add({
+      email: 'carlos@test.com',
+      client: { external_id: '0' },
+      role: { name: 'admin' },
+      external_id: 'chichi',
     })
-    expect(client).to.be.an('object')
-    expect(client).to.include({
-      'name': 'Zona Sur',
-      'external_id': '0',
-      'is_active': true
+    expect(user).to.be.an('object')
+    expect(user).to.include({
+      email: 'carlos@test.com',
+      external_id: 'chichi'
+    })
+    expect(user['client']).to.include({
+      name: 'ZonaSur',
+      external_id: '0',
+    })
+    expect(user['role']).to.include({
+      name: 'admin'
     })
   })
 
   it('should get an user by email', async () => {
-    const client = await UsersService.get('0')
-    expect(client).to.be.an('array')
-    expect(client[0]).to.include({
-      'name': 'Zona Sur',
-      'external_id': '0',
-      'is_active': true
+    const user = await UsersService.get('carlos@test.com')
+    expect(user).to.be.an('array')
+    expect(user[0]).to.include({
+      email: 'carlos@test.com',
+      external_id: 'chichi'
+    })
+    expect(user[0]['client']).to.include({
+      name: 'ZonaSur',
+      external_id: '0',
+    })
+    expect(user[0]['role']).to.include({
+      name: 'admin'
     })
   })
 
   it('should search an user', async () => {
-    const client = await UsersService.search({ 'name': 'Zona Sur' })
-    expect(client).to.be.an('array')
-    expect(client[0]).to.include({
-      'name': 'Zona Sur',
-      'external_id': '0',
-      'is_active': true
+    const user = await UsersService.search({ 'client.name': 'ZonaSur' })
+    expect(user).to.be.an('array')
+    expect(user[0]).to.include({
+      email: 'carlos@test.com',
+      external_id: 'chichi'
+    })
+    expect(user[0]['client']).to.include({
+      name: 'ZonaSur',
+      external_id: '0',
+    })
+    expect(user[0]['role']).to.include({
+      name: 'admin'
     })
   })
 
   it('should update an user by email', async () => {
-    const client = await UsersService.update('0', { 'name': 'ZonaSur' })
-    expect(client).to.be.an('object')
-    expect(client).to.include({ nModified: 1 })
+    const user = await UsersService.update('carlos@test.com', { 'external_id': 'chichi1' })
+    expect(user).to.be.an('object')
+    expect(user).to.include({ nModified: 1 })
   })
 })
