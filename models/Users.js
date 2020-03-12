@@ -11,21 +11,24 @@ let UsersSchema = new Schema({
   is_active: Boolean
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
+UsersSchema.index({
+  email: 'text'
+})
 
 UsersSchema.statics.get = function(email) {
   return this.find({ email })
 }
 
-UsersSchema.statics.add = async function(body) {
-  return await new Users(body).save()
+UsersSchema.statics.add = function(body) {
+  return this.create(body)
 }
 
 UsersSchema.statics.search = function(query) {
   return this.find(query)
 }
 
-UsersSchema.statics.getIdByEmail = function(query) {
-  return this.find(query)
+UsersSchema.statics.getId = function(query) {
+  return this.find(query).select('_id')
 }
 
 UsersSchema.statics.delete = function(email) {

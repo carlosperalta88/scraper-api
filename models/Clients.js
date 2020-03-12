@@ -20,7 +20,7 @@ ClientsSchema.statics.search = function(body) {
 }
 
 ClientsSchema.statics.getClientsId = function(body) {
-  return this.find(body)
+  return this.find(body).select('_id')
 }
 
 ClientsSchema.statics.delete = function(external_id) {

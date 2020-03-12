@@ -3,7 +3,7 @@ import CasesData from '../models/CasesData'
 import logger from '../config/winston'
 import Reports from '../models/Reports'
 import CourtSchema from '../models/Courts'
-import UsersSchema from '../models/Users'
+import UserService from '../services/users'
 import ClientSchema from '../models/Clients'
 
 class CaseService {
@@ -45,21 +45,33 @@ class CaseService {
     return this.applySort(roles)
   }
 
-  async addManyCases(cases) {
-    const bla = await cases.map(async (el) => {
-      const [a, b, c] = await Promise.all([
-        CourtSchema.search({ external_id: el.court_id }),
-        UsersSchema.getIdByEmail({ email: { $in: el.emails } }),
-        ClientSchema.getClientsId({ external_id: { $in: el.clients } })
-      ])
-
-      el['court'] = a
-      el['users'] = b
-      el['clients'] = c
-      el['is_active'] = true
+  async add(cases) {
+    const bla = Promise.all(cases.map(async item => this.caseCreator(item)))
+    .then(async (items) => {
+      const res = await this.cases.add(items)
+      Promise.resolve(res)
+      return res
     })
-    console.log(bla.then(x => x))
-    return await this.cases.insertMany(bla)
+    .then(x => x)
+    .catch((e) => {
+      Promise.reject(e)
+    })
+    return bla.then(x => x).catch(e => console.log(e))
+  }
+
+  async caseCreator(cas) {
+    [cas['court']] = await CourtSchema.search({ external_id: cas['court_id'] })
+    delete cas['court_id']
+
+    const clients = await ClientSchema.getClientsId({ external_id: { $in: cas['clients'] } })
+    cas['clients'] = clients.map(el => el['_id'])
+
+    const users = await UserService.getIdBySearch({ email: { $in: cas['emails'] } })
+    cas['users'] = users.map(el => el['_id'])
+    delete cas['emails']
+
+    cas['is_active'] = true
+    return cas
   }
 
   async deleteMany(roles) {

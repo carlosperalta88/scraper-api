@@ -12,11 +12,15 @@ class UsersService {
   }
 
   async add(body) {
-    const role = await Roles.search(body['role'])
-    const client = await Clients.search(body['client'])
-    body['role'] = role[0]
-    body['client'] = client[0]
+    const [role] = await Roles.search(body['role'])
+    const [client] = await Clients.search(body['client'])
+    body['role'] = role
+    body['client'] = client
     return await this.users.add(body)
+  }
+
+  async getIdBySearch(query) {
+    return await this.users.getId(query)
   }
 
   async search(query) {

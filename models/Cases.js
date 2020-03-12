@@ -51,9 +51,8 @@ CasesSchema.statics.search = function (query) {
   return this.find(query).populate('case').exec()
 }
 
-CasesSchema.statics.insertMany = function (items) {
-  console.log(items)
-  return Cases.insertMany(items)
+CasesSchema.statics.add = function (items) {
+  return this.insertMany(items)
 }
 
 const Cases = mongoose.model('Cases', CasesSchema)
