@@ -17,7 +17,7 @@ class ScraperService {
       uri: `${process.env.SCRAPER_URL}/add`,
       method: 'POST',
       body: {
-        roles: cases.map(el => bodyBuild(el))
+        roles: cases.map(el => this.bodyBuild(el))
       }}
   }
 

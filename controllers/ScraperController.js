@@ -1,5 +1,6 @@
 // role*court_name
 import logger from '../config/winston'
+import request from '../lib/api'
 import ScraperService from '../services/scraper'
 
 exports.addToScraperQueue = async (req, res) => {

@@ -7,7 +7,9 @@ import CourtsService from '../../../services/courts'
 import ClientsService from '../../../services/clients'
 import RolesService from '../../../services/roles'
 import UsersService from '../../../services/users'
+import CasesDataService from '../../../services/casesData'
 import conn from '../../../db/index'
+import CasesData from '../../../models/CasesData'
 
 describe('cases service', function() {
   before(async () => {
@@ -18,6 +20,11 @@ describe('cases service', function() {
     await ClientsService.add({
       'name': 'ZonaSur',
       'external_id': '0',
+      'is_active': true
+    })
+    await ClientsService.add({
+      'name': 'Delloro',
+      'external_id': 'RD',
       'is_active': true
     })
     await CourtsService.add([
@@ -65,6 +72,13 @@ describe('cases service', function() {
       external_id: 'chichi',
       is_active: true
     })
+    await UsersService.add({
+      email: 'carlos2@test.com',
+      client: { external_id: '0' },
+      role: { name: 'admin' },
+      external_id: 'chichi2',
+      is_active: true
+    })
   })
 
   
@@ -74,8 +88,338 @@ describe('cases service', function() {
       )
       .then(result => {
         expect(result).not.to.be.a('null')
+        expect(result).to.be.lengthOf(1)
+        expect(result[0]).to.include({ "external_id": "40692", "role":"C-3163-2018", "is_active": true })
+        expect(result[0]['court']).to.include({
+          name: '3º Juzgado de Letras de Iquique',
+          external_id: 11
+        })
+    })
+  })
+  
+  it('should create several cases', () => {
+    return CasesServices.add(
+      [
+        { "external_id": "40694", "role":"C-3163-2018", "court_id": 658, "clients":["0"], "emails": ["carlos@test.com"] },
+        { "external_id": "40693", "role":"C-3164-2019", "court_id": 279, "clients":["0"], "emails": ["carlos@test.com"] },
+        { "external_id": "322", "role": "C-546-2018", "court_id": 285, "clients": ["0"]}
+      ]
+      )
+      .then(result => {
+        expect(result).not.to.be.a('null')
+        expect(result).to.be.lengthOf(3)
+        expect(result[0]).to.include({ "external_id": "40694", "role":"C-3163-2018", "is_active": true })
+        expect(result[0]['court']).to.include({
+          name: '3º Juzgado de Letras de Calama',
+          external_id: 658
+        })
+        expect(result[1]).to.include({ "external_id": "40693", "role":"C-3164-2019", "is_active": true })
+        expect(result[1]['court']).to.include({
+          name: '21º Juzgado Civil de Santiago',
+          external_id: 279
+        })
       })
     })
+
+  it('should search cases', () => {
+    return CasesServices.search(
+      { role: { $in: ['C-3163-2018', 'C-3164-2019'] } }
+    )
+    .then(result => {
+      expect(result).not.to.be.a('null')
+      expect(result).to.be.lengthOf(3)
+      expect(result[0]).to.include({ "external_id": "40692", "role":"C-3163-2018", "is_active": true })
+      expect(result[0]['court']).to.include({
+        name: '3º Juzgado de Letras de Iquique',
+        external_id: 11
+      })
+      expect(result[1]).to.include({ "external_id": "40694", "role":"C-3163-2018", "is_active": true })
+      expect(result[1]['court']).to.include({
+        name: '3º Juzgado de Letras de Calama',
+        external_id: 658
+      })
+      expect(result[2]).to.include({ "external_id": "40693", "role":"C-3164-2019", "is_active": true })
+      expect(result[2]['court']).to.include({
+        name: '21º Juzgado Civil de Santiago',
+        external_id: 279
+      })
+    })
+  })
+
+  it('should add user to case', () => {
+    return CasesServices.updateUsers({ external_id: "40693"}, ['carlos2@test.com'])
+    .then(result => {
+      expect(result).not.to.be.a('null')
+      expect(result).to.include({ n: 1, nModified: 1, ok: 1 })
+    })
+  })
+
+  it('should add client to case', () => {
+    return CasesServices.updateClients({ external_id: "40693"}, ['RD'])
+    .then(result => {
+      expect(result).not.to.be.a('null')
+      expect(result).to.include({ n: 1, nModified: 1, ok: 1 })
+    })
+  })
+
+  it('should add scraped data', () => {
+    return CasesDataService.add({ body: {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada'
+    }, 
+    params: {
+      role: 'C-546-2018'
+    }})
+    .then(result => {
+      expect(result).not.to.be.a('null')
+      expect(result[0]).to.has.property('case_id')
+      expect(result[0]['cover']).to.equal('TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA')
+      expect(result[0]['document_status']).to.equal('Archivada')
+    })
+    .catch((e) => console.log(e))
+  })
+
+  it('should add scraped data', () => {
+    return CasesDataService.add({ body: {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada'
+    }, 
+    params: {
+      role: 'C-546-2018'
+    }})
+    .then(result => {
+      expect(result).not.to.be.a('null')
+      expect(result[0]).to.has.property('case_id')
+      expect(result[0]['cover']).to.equal('TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA')
+      expect(result[0]['document_status']).to.equal('Archivada')
+    })
+    .catch((e) => console.log(e))
+  })
+
+  it('should find a case with its data', () => {
+    return CasesServices.search(
+      { role: { $in: ['C-546-2018'] } }
+    )
+    .then(result => {
+      expect(result).not.to.be.a('null')
+    })
+  })
+
+  it('should deactivate cases', () => {
+    return CasesServices.deleteManyByExternalId(["40692", "40693"])
+      .then(result => {
+        expect(result).not.to.be.a('null')
+        expect(result).to.include({ n: 2, nModified: 2, ok: 1 })
+      })
+  })
     
     after(() => {
       conn.drop()

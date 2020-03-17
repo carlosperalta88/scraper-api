@@ -14,6 +14,6 @@ router.use('/scrape', scraper);
 router.use('/clients', clients);
 router.use('/users', users);
 router.use('/roles', roles);
-router.use('/cases-data')
+router.use('/cases-data', casesData)
 
 module.exports = router;

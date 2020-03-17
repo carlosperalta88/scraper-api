@@ -71,15 +71,28 @@ class CaseService {
     delete cas['emails']
 
     cas['is_active'] = true
+    cas['role'] = cas['role'].trim()
     return cas
   }
 
-  async deleteMany(roles) {
-    return await this.cases.deleteManyByExternalId(roles)
+  async deleteManyByExternalId(external_ids) {
+    return await this.cases.deleteManyByExternalId(external_ids)
   }
 
   async search(query) {
     return await this.cases.search(query)
+  }
+
+  async updateUsers(query, emails) {
+    const users = await UserService.getIdBySearch({ email: { $in: emails } })
+    const usersId = users.map(el => el['_id'])
+    return await this.cases.updateUsers(query, usersId)
+  }
+
+  async updateClients(query, clientsEI) {
+    const clients = await ClientSchema.getClientsId({ external_id: { $in: clientsEI } })
+    const clientsId = clients.map(el => el['_id'])
+    return await this.cases.updateClients(query, clientsId)
   }
 
 }

@@ -1,9 +1,8 @@
-import Cases from '../models/Cases'
 import mongoose from 'mongoose'
 let Schema = mongoose.Schema
 
 let CasesDataSchema = new Schema({
-  "case_id": { type: mongoose.Schema.ObjectId },
+  "case_id": { type: mongoose.Schema.ObjectId, required: true },
   "cover": { type: String },
   "date": Date,
   "document_status": String,
@@ -13,13 +12,9 @@ let CasesDataSchema = new Schema({
   "exhorts": [],
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-CasesDataSchema.statics.add = async function(role, court, payload) {
-  let [parent_case] = await Cases.find({ $and: [{ role: role }, { 'court.name': court }] })
-  payload['case_id'] = parent_case._id
-
-  return await new CasesData(payload).save()
+CasesDataSchema.statics.add = function (payload) {
+  return this.insertMany(payload)
 }
 
 const CasesData = mongoose.model('CasesData', CasesDataSchema)
-
 export default CasesData
