@@ -45,7 +45,7 @@ exports.deleteCaseByRoleAndCourt = async (req, res) => {
 exports.compare = async(req, res, next) => {
   try {
     const incomingRoleData = CaseService.formatScraperResponse(req.body)
-    let [storedVersion] = await CaseService.search({ $and: [{ role: req.params.role }, { 'court.name': incomingRoleData['court'] } ]})
+    let [storedVersion] = await CaseService.search({ $and: [{ role: req.params.role }, { 'court.name': incomingRoleData['court'] }, { is_active: true } ]})
     const casesComparisson = CaseService.compareCases(storedVersion, req.body)
     
     if(!casesComparisson.hasChanged) {
@@ -66,7 +66,7 @@ exports.compare = async(req, res, next) => {
 exports.update = async (req, res) => {
   try {
     const newData = CaseService.buildPayload(res.locals.storedVersion, req)
-    const updatedCase = await CaseService.update({ $and: [{ role: req.params.role }, { 'court.name': newData['court']['name'] }] }, newData)
+    const updatedCase = await CaseService.update({ $and: [{ role: req.params.role }, { 'court.name': newData['court']['name'] }, { is_active: true }] }, newData)
 
     logger.info(`${req.params.role} saved`)
     res.json(updatedCase).status(204)

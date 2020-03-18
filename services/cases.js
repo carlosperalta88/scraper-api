@@ -379,7 +379,7 @@ class CaseService {
   async aggregateByClient(client) {
     const roles = await this.cases.aggregate([
       {
-        $match: { 'clients.external_id': client }
+        $match: { $and: [{'clients.external_id': client}, {is_active: true}] }
       },
       this.reportAggregation
     ])
