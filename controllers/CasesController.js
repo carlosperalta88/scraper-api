@@ -41,21 +41,3 @@ exports.deleteManyCasesByExternalId = async (req, res) => {
     res.send(error).status(500)
   }
 }
-
-exports.buildReport = async (req, res) => {
-  try {
-    const data = await CaseService.aggregateByClient(req.params.client)
-    const payload = {
-      json: true,
-      uri: `${process.env.REPORT_URL}/generate`,
-      method: 'POST',
-      body: { data }
-    }
-
-    const response = await request.do(payload)
-    res.json(response)
-  } catch (error) {
-    logger.error(`failed formatting the cause ${error}`)
-    res.send(error).status(500)
-  }
-}

@@ -8,14 +8,18 @@ let ReportsSchema = new Schema({
   data: []
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-ReportsSchema.statics.create = async function(client, data) {
-  return await new Reports({ client, data }).save()
+ReportsSchema.statics.get = function(query) {
+  return this.find(query).populate('client')
 }
 
-ReportsSchema.statics.build = async function(client) {
-  return await Cases.aggregate([
+ReportsSchema.statics.create = function(client, data) {
+  return this.create({ client, data })
+}
+
+ReportsSchema.statics.build = function(client) {
+  return this.aggregate([
     {
-      $match: { 'clients.external_id': client }
+      $match: { $and: [{ 'clients.external_id': client }, { is_active: true }] }
     },
     reportAggregation
   ])
@@ -33,7 +37,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_dates: { $map: {
-          input: '$receptor',
+          input: '$case.0.receptor',
           as: 'ex',
           in: { $split: [{ $arrayElemAt: [{ $split: [{ $arrayElemAt: [{ $split: ['$$ex.retrieve_data', '.' ]}, 0]}, ' -  ']}, 1]}, '/']}
           }
@@ -56,7 +60,7 @@ let reportAggregation = {
   book_1: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$cause_history', 0 ]},
+        book: { $arrayElemAt: [ '$case.0.cause_history', 0 ]},
       },
       in: {
         $let: {
@@ -87,7 +91,7 @@ let reportAggregation = {
   book_2: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$cause_history', 1 ]},
+        book: { $arrayElemAt: [ '$case.0.cause_history', 1 ]},
       },
       in: {
         $let: {
@@ -118,7 +122,7 @@ let reportAggregation = {
   book_3: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$cause_history', 2 ]},
+        book: { $arrayElemAt: [ '$case.0.cause_history', 2 ]},
       },
       in: {
         $let: {
@@ -149,7 +153,7 @@ let reportAggregation = {
   last_docs_book_1: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$pending_docs', 0 ]},
+        book: { $arrayElemAt: [ '$case.0.pending_docs', 0 ]},
       },
       in: {
         $let: {
@@ -180,7 +184,7 @@ let reportAggregation = {
   last_docs_book_2: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$pending_docs', 1 ]},
+        book: { $arrayElemAt: [ '$case.0.pending_docs', 1 ]},
       },
       in: {
         $let: {
@@ -211,7 +215,7 @@ let reportAggregation = {
   last_docs_book_3: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$pending_docs', 2 ]},
+        book: { $arrayElemAt: [ '$case.0.pending_docs', 2 ]},
       },
       in: {
         $let: {
@@ -243,7 +247,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_dates: { $map: {
-            input: '$exhorts',
+            input: '$case.0.exhorts',
             as: 'ex',
             in: { $split: ['$$ex.exhort_added_date', '/'] }
           }
@@ -267,7 +271,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_dates: { $map: {
-            input: '$exhorts',
+            input: '$case.0.exhorts',
             as: 'ex',
             in: { $split: ['$$ex.exhort_order_date', '/'] }
           }
@@ -291,7 +295,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_details: { $map: {
-            input: '$exhorts',
+            input: '$case.0.exhorts',
             as: 'ex',
             in: '$$ex.role_destination_detail'
           }
