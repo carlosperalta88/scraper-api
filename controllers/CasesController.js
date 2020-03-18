@@ -34,7 +34,7 @@ exports.deleteCaseByRoleAndCourt = async (req, res) => {
 
 exports.deleteManyCasesByExternalId = async (req, res) => {
   try {
-    const query = await CaseService.deleteMany(req.body.external_ids)
+    const query = await CaseService.deleteManyByExternalId(req.body.external_ids)
     res.json(query)
   } catch (error) {
     logger.info(`fail ${error}`)
