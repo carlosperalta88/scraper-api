@@ -2,11 +2,19 @@
 import logger from '../config/winston'
 import request from '../lib/api'
 import ScraperService from '../services/scraper'
+import ScraperObserver from '../observers/Scraper'
+
+const scraper = new ScraperObserver()
 
 exports.addToScraperQueue = async (req, res) => {
   try {
-    const cases = await ScraperService.addToScraperQueue(req.body.query)
-    res.json(cases).status(cases.code)
+    const cases = await ScraperService.rolesToScrape(req.body.query)
+    scraper
+      .on('elementsAdded', (el) => {
+        logger.info(`added ${el} cases`)
+        res.json({ rolesLength: el }).status(201)
+      })
+      .add(cases)
   } catch (e) {
     logger.error(`couldn't add roles to queue ${e}`)
     res.status(500).send({ ...e })
@@ -15,19 +23,8 @@ exports.addToScraperQueue = async (req, res) => {
 
 exports.executeScraper = async (req, res) => {
   try {
-    if (!req.query.queue) {
-      throw new Error('Missing queue name')
-    }
-    (function loop (index) {const payload = {
-      method: 'GET',
-      json: true,
-      uri: `${process.env.SCRAPER_URL}/execute?queue=${req.query.queue}`
-    }
-    setTimeout(() => {
-      let response = request.do(payload)
-      if (--index) loop(index)
-    }, 10000)})(req.query.length)
-    res.send('starting')
+    scraper.scrape()
+    res.status(200)
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)
     res.status(500).send({ error: e.name, message: e.message })
@@ -43,3 +40,9 @@ exports.getQueueLength = async (req, res) => {
     res.send({ error: error.name, message: error.message }).status(500)
   }
 }
+
+scraper
+  .on('roleRemoved', role => logger.info(`${role} successfully removed from queue`))
+  .on('badResponse', response => logger.error(response))
+  .on('sentFailed', error => logger.error(error))
+  .on('failedStart', error => logger.error(error))

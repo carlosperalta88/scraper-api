@@ -26,6 +26,18 @@ class ScraperService {
     return await request.do(this.addCasesPayloadBuilder(result))
   }
 
+  async rolesToScrape(query) {
+    return compose(this.formatRolesToScrape, this.getRolesToScrape)(query)
+  }
+
+  formatRolesToScrape(cases) {
+    return cases.map(el => this.bodyBuild(el))
+  }
+
+  async getRolesToScrape(query) {
+    return await this.cases.search(query)
+  }
+
   async getQueueLength(queue) {
     const payload = {
       method: 'GET',
