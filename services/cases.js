@@ -17,7 +17,6 @@ class CaseService {
       Promise.resolve(res)
       return res
     })
-    .then(x => x)
     .catch((e) => {
       Promise.reject(e)
     })

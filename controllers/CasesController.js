@@ -4,21 +4,21 @@ import CaseService from '../services/cases'
 
 exports.addCases = async (req, res) => {
   try {
-    const cases = await CaseService.addManyCases(req.body.cases)
+    const cases = await CaseService.add(req.body.cases)
     res.json(cases).status(202)
   } catch (error) {
     logger.info(error)
-    res.send(error).status(500)
+    return res.send(error).status(500)
   }
 }
 
 exports.searchCases = async (req, res) => {
   try {
-    const search = await CaseService.search(req.body.search)
+    const search = await CaseService.search(req.body.query)
     res.json(search).status(200)
   } catch (error) {
     logger.info(error)
-    res.send(error).status(500)
+    return res.send(error).status(500)
   }
 }
 
@@ -28,7 +28,7 @@ exports.deleteCaseByRoleAndCourt = async (req, res) => {
     res.json(query)
   } catch (error) {
     logger.info(error)
-    res.send(error)
+    return res.send(error)
   }
 }
 
@@ -38,6 +38,6 @@ exports.deleteManyCasesByExternalId = async (req, res) => {
     res.json(query)
   } catch (error) {
     logger.info(`fail ${error}`)
-    res.send(error).status(500)
+    return res.send(error).status(500)
   }
 }

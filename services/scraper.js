@@ -3,8 +3,7 @@ import Cases from '../models/Cases'
 import request from '../lib/api'
 
 class ScraperService {
-  constructor(Cases) {
-    this.cases = Cases
+  constructor() {
   }
 
   bodyBuild(item) {
@@ -22,12 +21,14 @@ class ScraperService {
   }
 
   async addToScraperQueue(query) {
-    const result = await this.cases.search(query)
+    const result = await Cases.search(query)
+    console.log(result)
     return await request.do(this.addCasesPayloadBuilder(result))
   }
 
   async rolesToScrape(query) {
-    return compose(this.formatRolesToScrape, this.getRolesToScrape)(query)
+    const roles = await this.getRolesToScrape(query)
+    return this.formatRolesToScrape(roles)
   }
 
   formatRolesToScrape(cases) {
@@ -35,7 +36,7 @@ class ScraperService {
   }
 
   async getRolesToScrape(query) {
-    return await this.cases.search(query)
+    return await Cases.search(query).then(x => x)
   }
 
   async getQueueLength(queue) {
@@ -50,4 +51,4 @@ class ScraperService {
 
 const compose = (...fns) => x => fns.reduceRight((y, f) => f(y), x)
 
-module.exports = new ScraperService(Cases)
+module.exports = new ScraperService()

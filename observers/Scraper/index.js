@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import request from '../lib/api'
+import request from '../../lib/api'
 
 class ObservableScraper extends EventEmitter{
   constructor(queue = []) {
@@ -32,6 +32,7 @@ class ObservableScraper extends EventEmitter{
             const idx = this.queue.indexOf(role)
             this.queue.splice(idx, 1)
             this.emit('roleRemoved', role)
+            this.emit('scrape', this)
             return this
           }
           this.emit('badResponse', response)
@@ -64,3 +65,5 @@ class ObservableScraper extends EventEmitter{
     this.emit('resume', `Quere resumed with ${this.queue.length} items`)
   }
 }
+
+export default ObservableScraper

@@ -1,6 +1,5 @@
 // role*court_name
 import logger from '../config/winston'
-import request from '../lib/api'
 import ScraperService from '../services/scraper'
 import ScraperObserver from '../observers/Scraper'
 
@@ -17,17 +16,22 @@ exports.addToScraperQueue = async (req, res) => {
       .add(cases)
   } catch (e) {
     logger.error(`couldn't add roles to queue ${e}`)
-    res.status(500).send({ ...e })
+    return res.status(500).send({ ...e })
   }
 }
 
 exports.executeScraper = async (req, res) => {
   try {
-    scraper.scrape()
-    res.status(200)
+    scraper
+      .on('sent', response => {
+        res.json(response).status(204)
+        return
+      })
+      .scrape()
+      return
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)
-    res.status(500).send({ error: e.name, message: e.message })
+    return res.status(500).send({ error: e.name, message: e.message })
   }
 }
 
@@ -37,12 +41,27 @@ exports.getQueueLength = async (req, res) => {
     res.json(response).status(200)
   } catch (error) {
     logger.error(`failed to get queue length`)
-    res.send({ error: error.name, message: error.message }).status(500)
+    return res.send({ error: error.name, message: error.message }).status(500)
   }
 }
 
 scraper
-  .on('roleRemoved', role => logger.info(`${role} successfully removed from queue`))
-  .on('badResponse', response => logger.error(response))
-  .on('sentFailed', error => logger.error(error))
-  .on('failedStart', error => logger.error(error))
+  .on('roleRemoved', role => {
+    logger.info(`${role} successfully removed from queue`)
+    return
+  })
+  .on('badResponse', response => {
+    logger.error(response)
+    return
+  })
+  .on('sentFailed', error => {
+    logger.error(error)
+    return
+  })
+  .on('failedStart', error => {
+    logger.error(error)
+    return
+  })
+  .on('scrape', sc => {
+    return sc.scrape()
+  })

@@ -3,7 +3,7 @@ let Schema = mongoose.Schema
 
 let CourtsSchema = new Schema({
   name: { type: String, required: true },
-  external_id: { type: Number, require: true, unique: true}
+  external_id: { type: Number, require: true, unique: false}
 })
 
 CourtsSchema.statics.add = function(courts) {
