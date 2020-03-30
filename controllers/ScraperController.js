@@ -8,10 +8,10 @@ const scraper = new ScraperObserver()
 exports.addToScraperQueue = async (req, res) => {
   try {
     const cases = await ScraperService.rolesToScrape(req.body.query)
-    scraper
+    return scraper
       .on('elementsAdded', (el) => {
         logger.info(`added ${el} cases`)
-        res.json({ rolesLength: el }).status(201)
+        return res.json({ rolesLength: el }).status(201)
       })
       .add(cases)
   } catch (e) {
@@ -22,13 +22,10 @@ exports.addToScraperQueue = async (req, res) => {
 
 exports.executeScraper = async (req, res) => {
   try {
-    scraper
-      .on('sent', response => {
-        res.json(response).status(204)
-        return
-      })
-      .scrape()
-      return
+    scraper.scrape()
+    return res.json({
+      message: 'scrape started...'
+    }).status(204)
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)
     return res.status(500).send({ error: e.name, message: e.message })
@@ -46,9 +43,9 @@ exports.getQueueLength = async (req, res) => {
 }
 
 scraper
-  .on('roleRemoved', role => {
-    logger.info(`${role} successfully removed from queue`)
-    return
+  .on('roleRemoved', ob => {
+    logger.info(`${ob.role} successfully removed from queue`)
+    return ob.sc.scrape()
   })
   .on('badResponse', response => {
     logger.error(response)
@@ -62,6 +59,7 @@ scraper
     logger.error(error)
     return
   })
-  .on('scrape', sc => {
-    return sc.scrape()
+  .on('sent', res => {
+    logger.info(res)
+    return
   })

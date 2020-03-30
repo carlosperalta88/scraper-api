@@ -3,7 +3,8 @@ import ReportsService from '../services/reports'
 
 exports.buildReport = async (req, res) => {
   try {
-    const response = await ReportsService.add(req.params.client)
+    const response = await ReportsService.getReport(req.body.client)
+    // console.log(response)
     res.json(response)
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)

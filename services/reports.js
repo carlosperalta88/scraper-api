@@ -1,5 +1,6 @@
 import ReportsModel from '../models/Reports'
 import ClientModel from '../models/Clients'
+import CasesModel from '../models/Cases'
 
 class Reports {
   constructor(ReportsModel, ClientModel) {
@@ -29,14 +30,21 @@ class Reports {
     })
   }
 
-  async add(client) {
-    const {clientId} = this.clients.getClientsId(client)
-    const report = compose(this.applySort, await this.reports.build)(client)
+  async add(clientExternalId) {
+    const [ client ]= await this.clients.getClientsId({ 'external_id': clientExternalId})
+    const rawReport = await this.reports.build(client)
+    const report = this.applySort(rawReport)
     return await this.reports.add(clientId, report)
   }
 
   async get(query) {
     return await this.reports.get(query)
+  }
+
+  async getReport(clientExternalId) {
+    const [ client ]= await this.clients.getClientsId({ 'external_id': clientExternalId})
+    const report = await CasesModel.buildReport(client._id)
+    return this.applySort(report)
   }
 }
 

@@ -26,7 +26,7 @@ CasesSchema.virtual('cases', {
   ref: 'CasesData',
   localField: '_id',
   foreignField: 'case_id',
-  options: { sort: { date: -1 }, limit: 1 }
+  options: { sort: { created_at: -1 }, limit: 1 }
 })
 
 CasesSchema.statics.deleteManyByExternalId = function(external_ids) {
@@ -69,21 +69,29 @@ CasesSchema.statics.add = function (items) {
 CasesSchema.statics.buildReport = function(client) {
   return this.aggregate([
     {
-      $match: { $and: [{ 'clients.external_id': client }, { is_active: true }] }
+      $match: { $and: [{ clients: client }, { is_active: true }] }
     },
     {
       $lookup: {
-        from: 'CasesData',
-        localField: '_id',
-        foreignField: 'case_id',
-        as: 'case'
+        from: 'casesdatas',
+        let: { case_id: '$_id' },
+        pipeline: [
+          { $match: { 
+            $expr: {
+              $eq: ['$case_id', '$$case_id']
+            }
+          } },
+          { $sort: { 'created_at': -1 } },
+          { $limit: 1 }
+        ],
+        as: 'cases'
       }
     },
     reportAggregation
   ])
 }
 
-let reportAggregation = { 
+const reportAggregation = { 
   $project: {
   role: 1,
   court: '$court.name',
@@ -95,7 +103,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_dates: { $map: {
-          input: '$case.0.receptor',
+          input: { $arrayElemAt: ['$cases.receptor', 0]},
           as: 'ex',
           in: { $split: [{ $arrayElemAt: [{ $split: [{ $arrayElemAt: [{ $split: ['$$ex.retrieve_data', '.' ]}, 0]}, ' -  ']}, 1]}, '/']}
           }
@@ -118,7 +126,7 @@ let reportAggregation = {
   book_1: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$case.0.cause_history', 0 ]},
+        book: { $arrayElemAt: [{ $arrayElemAt: [ '$cases.cause_history', 0 ]}, 0] },
       },
       in: {
         $let: {
@@ -149,7 +157,7 @@ let reportAggregation = {
   book_2: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$case.0.cause_history', 1 ]},
+        book: { $arrayElemAt: [{ $arrayElemAt: [ '$cases.cause_history', 0 ]}, 1] },
       },
       in: {
         $let: {
@@ -180,7 +188,7 @@ let reportAggregation = {
   book_3: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$case.0.cause_history', 2 ]},
+        book: { $arrayElemAt: [{ $arrayElemAt: [ '$cases.cause_history', 0 ]}, 2] },
       },
       in: {
         $let: {
@@ -211,7 +219,7 @@ let reportAggregation = {
   last_docs_book_1: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$case.0.pending_docs', 0 ]},
+        book: { $arrayElemAt: [{ $arrayElemAt: [ '$cases.pending_docs', 0 ]}, 0] },
       },
       in: {
         $let: {
@@ -242,7 +250,7 @@ let reportAggregation = {
   last_docs_book_2: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$case.0.pending_docs', 1 ]},
+        book: { $arrayElemAt: [{ $arrayElemAt: [ '$cases.pending_docs', 0 ]}, 1] },
       },
       in: {
         $let: {
@@ -273,7 +281,7 @@ let reportAggregation = {
   last_docs_book_3: {
     $let: {
       vars: {
-        book: { $arrayElemAt: [ '$case.0.pending_docs', 2 ]},
+        book: { $arrayElemAt: [{ $arrayElemAt: [ '$cases.pending_docs', 0 ]}, 2] },
       },
       in: {
         $let: {
@@ -305,7 +313,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_dates: { $map: {
-            input: '$case.0.exhorts',
+            input: { $arrayElemAt: ['$cases.exhorts',0]},
             as: 'ex',
             in: { $split: ['$$ex.exhort_added_date', '/'] }
           }
@@ -329,7 +337,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_dates: { $map: {
-            input: '$case.0.exhorts',
+            input: { $arrayElemAt: ['$cases.exhorts',0]},
             as: 'ex',
             in: { $split: ['$$ex.exhort_order_date', '/'] }
           }
@@ -353,7 +361,7 @@ let reportAggregation = {
     $let: {
       vars: {
         splitted_details: { $map: {
-            input: '$case.0.exhorts',
+            input: { $arrayElemAt: ['$cases.exhorts',0]},
             as: 'ex',
             in: '$$ex.role_destination_detail'
           }

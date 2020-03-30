@@ -25,14 +25,13 @@ class ObservableScraper extends EventEmitter{
         body: {
           roles: [role]
         }}
-      request.do(payload)
+      return request.do(payload)
         .then(response => {
           if (response.code && response.code === 201) {
             this.emit('sent', { response, role })
             const idx = this.queue.indexOf(role)
             this.queue.splice(idx, 1)
-            this.emit('roleRemoved', role)
-            this.emit('scrape', this)
+            this.emit('roleRemoved', {sc: this, role: role})
             return this
           }
           this.emit('badResponse', response)
@@ -42,7 +41,6 @@ class ObservableScraper extends EventEmitter{
           this.emit('sentFailed', { err, role })
           return this
         })
-        return this
       }
     this.emit('failedStart', { scraping: this.scraping, queueLength: this.queue.length })
     return this
@@ -63,6 +61,7 @@ class ObservableScraper extends EventEmitter{
   startScraper() {
     this.scrape = true
     this.emit('resume', `Quere resumed with ${this.queue.length} items`)
+    return this
   }
 }
 

@@ -7,6 +7,7 @@ var clients = require('./clients');
 var users = require('./users');
 var roles = require('./roles');
 var casesData = require('./casesData');
+var reports = require('./reports');
 
 router.use('/cases', cases);
 router.use('/courts', courts);
@@ -14,6 +15,7 @@ router.use('/scrape', scraper);
 router.use('/clients', clients);
 router.use('/users', users);
 router.use('/roles', roles);
-router.use('/cases-data', casesData)
+router.use('/cases-data', casesData);
+router.use('/reports', reports)
 
 module.exports = router;
