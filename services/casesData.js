@@ -1,5 +1,6 @@
 import CasesDataModel from '../models/CasesData'
 import Cases from '../models/Cases'
+import ObservableInsert from '../observers/Insert'
 
 class CasesData {
   constructor(CasesDataModel) {
@@ -39,6 +40,7 @@ class CasesData {
     const payload = compose(this.formatDate, this.formatScraperResponse)(req)
     let [parent_case] = await Cases.getCaseId({ $and: [{ role: req.params.role.trim() }, { 'court.name': payload['court'] }] })
     payload['case_id'] = parent_case
+    ObservableInsert.checkInsert(payload)
     return await this.casesData.add(payload)
   }
 }

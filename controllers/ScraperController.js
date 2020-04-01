@@ -2,18 +2,15 @@
 import logger from '../config/winston'
 import ScraperService from '../services/scraper'
 import ScraperObserver from '../observers/Scraper'
+import ObservableInsert from '../observers/Insert'
 
 const scraper = new ScraperObserver()
 
 exports.addToScraperQueue = async (req, res) => {
   try {
     const cases = await ScraperService.rolesToScrape(req.body.query)
-    return scraper
-      .on('elementsAdded', (el) => {
-        logger.info(`added ${el} cases`)
-        return res.json({ rolesLength: el }).status(201)
-      })
-      .add(cases)
+    scraper.add(cases)
+    res.json(cases).status(201)
   } catch (e) {
     logger.error(`couldn't add roles to queue ${e}`)
     return res.status(500).send({ ...e })
@@ -63,3 +60,17 @@ scraper
     logger.info(res)
     return
   })
+  .on('elementsAdded', (el) => {
+    logger.info(`added ${el} cases`)
+    return 
+  })
+
+ObservableInsert
+  .on('retry', async (role) => {
+    logger.info(`retrying role`)
+    const cases = await ScraperService.rolesToScrape({ _id: role['case_id']})
+    scraper
+      .add(cases)
+      .scrape()
+    return
+})

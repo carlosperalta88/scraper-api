@@ -1,10 +1,10 @@
 import logger from '../config/winston'
 import ReportsService from '../services/reports'
+import request from '../lib/api'
 
 exports.buildReport = async (req, res) => {
   try {
     const response = await ReportsService.getReport(req.body.client)
-    // console.log(response)
     res.json(response)
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)
@@ -24,7 +24,7 @@ exports.getReports = async (req, res) => {
 
 exports.exportReport = async (req, res) => {
   try {
-    const data = await ReportsService.get(req.query)
+    const data = await ReportsService.getReport(req.body.client)
     const payload = {
       json: true,
       uri: `${process.env.REPORT_URL}/generate`,
