@@ -95,7 +95,8 @@ const reportAggregation = {
   $project: {
   role: 1,
   court: '$court.name',
-  document_status: 1,
+  document_status: '$cases.document_status',
+  cover: '$cases.cover',
   external_id: 1,
   cover: 1,
   date: 1,
