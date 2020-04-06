@@ -12,6 +12,10 @@ let CasesDataSchema = new Schema({
   "exhorts": [],
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
+CasesDataSchema.index({
+  case_id: 1
+})
+
 CasesDataSchema.statics.add = function (payload) {
   return this.insertMany(payload)
 }

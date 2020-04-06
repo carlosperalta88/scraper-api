@@ -19,7 +19,7 @@ CasesSchema.set('toObject', { virtuals: true })
 CasesSchema.set('toJSON', { virtuals: true })
 
 CasesSchema.index({
-  role: 'text'
+  role: 1
 })
 
 CasesSchema.virtual('cases', {

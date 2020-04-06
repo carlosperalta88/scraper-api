@@ -1,6 +1,7 @@
 import logger from '../config/winston'
 import ReportsService from '../services/reports'
 import request from '../lib/api'
+import reportObserver from '../observers/Reports'
 
 exports.buildReport = async (req, res) => {
   try {
@@ -24,19 +25,21 @@ exports.getReports = async (req, res) => {
 
 exports.exportReport = async (req, res) => {
   try {
-    const data = await ReportsService.getReport(req.body.client)
-    const payload = {
-      json: true,
-      uri: `${process.env.REPORT_URL}/generate`,
-      method: 'POST',
-      body: { data }
-    }
-
-    const response = await request.do(payload)
-    res.json(response)
+    reportObserver.create(req.body.client)
+    res.json({ message: 'generating report' })
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)
     res.send(error).status(500)
   }
 }
 
+reportObserver
+  .on('reportResponse', (response) => {
+    logger.info(response)
+    return
+  })
+  .on('reportsError', (error) => {
+    logger.info('reportsError')
+    logger.error(error)
+    return
+  })
