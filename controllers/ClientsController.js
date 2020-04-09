@@ -1,5 +1,5 @@
-const logger = require('../config/winston')
-const clientService = require('../services/clients')
+import logger from '../config/winston'
+import clientService from '../services/clients'
 
 exports.get = async (req, res) => {
   try {
@@ -25,7 +25,7 @@ exports.add = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
-    const query = await clientService.search(req.body)
+    const query = await clientService.search(req.body.query)
     res.json(query).status(200)
   } catch (error) {
     console.log(error)

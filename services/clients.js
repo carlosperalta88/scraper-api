@@ -1,34 +1,28 @@
-const Clients = require('../models/Clients')
-const logger = require('../config/winston')
+import Clients from '../models/Clients'
 
 class ClientsService {
-  constructor() {
-    this.logger = logger
+  constructor(Clients) {
     this.clients = Clients
   }
 
   async get(external_id) {
-    return await this.clients.find({ external_id })
+    return await this.clients.get(external_id)
   }
 
   async add(body) {
-    const client = new this.clients(body)
-    await client.save()
-    return client
+    return await this.clients.add(body)
   }
 
-  async search(body) {
-    return await this.clients.find(body)
+  async search(query) {
+    return await this.clients.search(query)
   }
 
   async delete(external_id) {
-    return await this.clients.updateOne({ external_id: external_id }, { $set: { is_active: false } })
+    return await this.clients.delete(external_id)
   }
-
   async update(external_id, body) {
-    return await this.clients.updateOne({ external_id }, { $set: body })
+    return await this.clients.update(external_id, body)
   }
-
 }
 
-module.exports = new ClientsService()
+module.exports = new ClientsService(Clients)

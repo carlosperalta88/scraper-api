@@ -1,22 +1,18 @@
-const Roles = require('../models/Roles')
-const logger = require('../config/winston')
+import Roles from '../models/Roles'
 
 class RolesService {
-  constructor() {
-    this.logger = logger
+  constructor(Roles) {
     this.roles = Roles
   }
 
   async get(name) {
-    return await this.roles.find({ name })
+    return await this.roles.search({ name })
   }
 
   async add(body) {
-    const role = new this.roles(body)
-    await role.save()
-    return role
+    return await this.roles.add(body)
   }
 
 }
 
-module.exports = new RolesService()
+module.exports = new RolesService(Roles)

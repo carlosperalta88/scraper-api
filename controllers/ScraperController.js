@@ -1,90 +1,74 @@
 // role*court_name
-const Case = require('../models/Cases')
-const request = require('../lib/api')
-const logger = require('../config/winston')
+import logger from '../config/winston'
+import ScraperService from '../services/scraper'
+import ScraperObserver from '../observers/Scraper'
+import ObservableInsert from '../observers/Insert'
 
-exports.addRoleToScraperQueue = async (req, res) => {
+exports.addToScraperQueue = async (req, res) => {
   try {
-    const caseToAdd = await findByRoleAndCourt(req.params.role, req.params.court)
-    const response = await request.do(addCasesPayloadBuilder(caseToAdd))
-    res.json(response)
-  } catch (e) {
-    logger.error(`couldn't add role to queue ${e}`)
-    res.status(500).send({ ...e })
-  }
-}
-
-const findByRoleAndCourt = async (role, court) => {
-  const r = await Case.find({ role, "court.external_id": court })
-  return r
-}
-
-const bodyBuild = (item) => {
-  return encodeURI(`${item['role']}*${item['court']['name']}`)
-}
-
-const addCasesPayloadBuilder = (cases) => {
-  return {
-    json: true,
-    uri: `${process.env.SCRAPER_URL}/add`,
-    method: 'POST',
-    body: {
-      roles: cases.map(el => bodyBuild(el))
-    }}
-}
-
-exports.addManyRolesToScraperQueue = async (req, res) => {
-  try {
-    const casesToAdd = await findRolesByClient(req.params.client)
-    const response = await request.do(addCasesPayloadBuilder(casesToAdd))
-    res.status(response.code).json(response)
+    const cases = await ScraperService.rolesToScrape(req.body.query)
+    ScraperObserver.add(cases)
+    res.json(cases).status(201)
   } catch (e) {
     logger.error(`couldn't add roles to queue ${e}`)
-    res.status(500).json({error: e.toString()})
+    return res.status(500).send({ ...e })
   }
-}
-
-const findAllActiveRoles = async () => {
-  const cases = await Case.find({ is_active: true })
-  return cases
-}
-
-const findRolesByClient = async (client) => {
-  return await Case.find({ 'clients.external_id': client })
 }
 
 exports.executeScraper = async (req, res) => {
   try {
-    if (!req.query.queue) {
-      throw new Error('Missing queue name')
-    }
-    (function loop (index) {const payload = {
-      method: 'GET',
-      json: true,
-      uri: `${process.env.SCRAPER_URL}/execute?queue=${req.query.queue}`
-    }
-    setTimeout(() => {
-      let response = request.do(payload)
-      if (--index) loop(index)
-    }, 10000)})(req.query.length)
-    res.send('starting')
+    ScraperObserver.scrape()
+    return res.json({
+      message: 'scrape started...'
+    }).status(204)
   } catch (e) {
     logger.error(`couldn't start scraper ${e}`)
-    res.status(500).send({ error: e.name, message: e.message })
+    return res.status(500).send({ error: e.name, message: e.message })
   }
 }
 
 exports.getQueueLength = async (req, res) => {
   try {
-    const payload = {
-      method: 'GET',
-      json: true,
-      uri: `${process.env.SCRAPER_URL}/count?name=${req.params.queue}`
-    }
-    const response = await request.do(payload)
+    const response = await ScraperService.getQueueLength(req.params.queue)
     res.json(response).status(200)
   } catch (error) {
     logger.error(`failed to get queue length`)
-    res.send({ error: error.name, message: error.message }).status(500)
+    return res.send({ error: error.name, message: error.message }).status(500)
   }
 }
+
+ScraperObserver
+  .on('roleRemoved', ob => {
+    logger.info(`${ob.role} successfully removed from queue`)
+    return ob.sc.scrape()
+  })
+  .on('badResponse', response => {
+    logger.error(response)
+    return
+  })
+  .on('sentFailed', error => {
+    logger.error(error)
+    return
+  })
+  .on('failedStart', error => {
+    logger.info(error)
+    return
+  })
+  .on('sent', res => {
+    logger.info(res)
+    return
+  })
+  .on('elementsAdded', (el) => {
+    logger.info(`added ${el} cases`)
+    return 
+  })
+
+ObservableInsert
+  .on('retry', async (role) => {
+    logger.info(`retrying role ${role}`)
+    const cases = await ScraperService.rolesToScrape({ _id: role['case_id']})
+    ScraperObserver
+      .add(cases)
+      .scrape()
+    return
+})

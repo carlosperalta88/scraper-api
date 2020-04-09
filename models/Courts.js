@@ -1,9 +1,18 @@
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+let Schema = mongoose.Schema
 
-var CourtsSchema = new Schema({
+let CourtsSchema = new Schema({
   name: { type: String, required: true },
-  external_id: Number
+  external_id: { type: Number, require: true, unique: false}
 })
 
-module.exports = mongoose.model('Courts', CourtsSchema)
+CourtsSchema.statics.add = function(courts) {
+  return this.insertMany(courts)
+}
+
+CourtsSchema.statics.search = function(query) {
+  return this.find(query)
+}
+
+const Courts = mongoose.model('Courts', CourtsSchema)
+export default Courts

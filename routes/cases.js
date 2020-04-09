@@ -1,12 +1,11 @@
 var express = require('express')
+var authController = require('../controllers/AuthController')
 var router = express.Router()
 var casesController = require('../controllers/CasesController')
 
-router.post('/add', casesController.addCase)
-router.post('/bulk/add', casesController.addCases)
-router.get('/report/:client', casesController.buildReport)
-router.get('/:role', casesController.getCaseByRole)
-router.delete('/:role/deactivate', casesController.deleteCaseByRoleAndCourt)
-router.patch('/:role/update', casesController.compare, casesController.update)
+router.post('/add', authController.APIKey, casesController.addCases)
+router.post('/search', authController.APIKey, casesController.searchCases)
+router.delete('/deactivate', authController.APIKey, casesController.deleteManyCasesByExternalId)
+router.delete('/:role/deactivate', authController.APIKey, casesController.deleteCaseByRoleAndCourt)
 
 module.exports = router

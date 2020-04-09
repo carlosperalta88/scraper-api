@@ -37,4 +37,12 @@ function close() {
   return mongoose.disconnect();
 }
 
-module.exports = { connect, close };
+function drop(done) {
+  if (process.env.NODE_ENV === 'test') { 
+    mongoose.connection.db.dropDatabase(function() {
+      mongoose.connection.close(done)
+    })
+  }
+}
+
+module.exports = { connect, close, drop };
