@@ -65,4 +65,4 @@ class ObservableScraper extends EventEmitter{
   }
 }
 
-export default ObservableScraper
+export default new ObservableScraper()

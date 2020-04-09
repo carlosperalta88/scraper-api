@@ -59,6 +59,11 @@ class CaseService {
     return await this.cases.updateClients(query, clientsId)
   }
 
+  async getCaseUsers(query) {
+    const users = await this.cases.getCaseUsers(query)
+    return users.map(el => el.email)
+  }
+
 }
 
 const compose = (...fns) => x => fns.reduceRight((y, f) => f(y), x)

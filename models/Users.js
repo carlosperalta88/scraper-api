@@ -4,11 +4,11 @@ import Clients from '../models/Clients'
 import Roles from '../models/Roles'
 
 let UsersSchema = new Schema({
-  email: { type: String, required: true },
-  client: { type: Clients.schema, required: true, unique: false },
-  role: { type: Roles.schema, required: true, unique: false},
-  external_id: String,
-  is_active: Boolean
+  "email": { type: String, required: true },
+  "client": { type: Clients.schema, required: true, unique: false },
+  "role": { type: Roles.schema, required: true, unique: false},
+  "external_id": String,
+  "is_active": Boolean
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
 UsersSchema.index({
@@ -29,6 +29,10 @@ UsersSchema.statics.search = function(query) {
 
 UsersSchema.statics.getId = function(query) {
   return this.find(query).select('_id')
+}
+
+UsersSchema.statics.getEmailById = function(query) {
+  return this.find(query).select('email')
 }
 
 UsersSchema.statics.delete = function(email) {

@@ -14,20 +14,19 @@ class NotificationsService {
   }
 
   async addNotification(role, changes, emails) {
-    const notification = new this.notifications({role, variations: changes, status: this.NOTIFICATION_STATUS.CREATED, emails })
-    return await notification.save()
+    return await this.notifications({role, variations: changes, status: this.NOTIFICATION_STATUS.CREATED, emails })
   }
 
   async getNotificationsToBeSent() {
-    return await this.notifications.find({ status: this.NOTIFICATION_STATUS.CREATED })
+    return await this.notifications({ status: this.NOTIFICATION_STATUS.CREATED })
   }
 
   async getNotificationsToRetry() {
-    return await this.notifications.find({ status: { $in: [this.NOTIFICATION_STATUS.PARTIALLY_SENT, this.NOTIFICATION_STATUS.FAILED] } })
+    return await this.notifications({ status: { $in: [this.NOTIFICATION_STATUS.PARTIALLY_SENT, this.NOTIFICATION_STATUS.FAILED] } })
   }
 
   async getSentNotifications() {
-    return await this.notifications.find({ status: this.NOTIFICATION_STATUS.SENT })
+    return await this.notifications({ status: this.NOTIFICATION_STATUS.SENT })
   }
 }
 

@@ -1,6 +1,10 @@
 import { EventEmitter } from 'events'
 
 class ObservableInsert extends EventEmitter {
+  constructor() {
+    super()
+  }
+  
   checkInsert(payload) {
     if (!payload) return this
 
@@ -8,9 +12,9 @@ class ObservableInsert extends EventEmitter {
       this.emit('retry', payload)
       return this
     }
-
+    this.emit('compare', payload)
     return this
-  } 
+  }
 }
 
 module.exports = new ObservableInsert()

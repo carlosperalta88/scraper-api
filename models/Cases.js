@@ -1,8 +1,5 @@
 import mongoose from 'mongoose'
 import CourtSchema from '../models/Courts'
-import UsersSchema from '../models/Users'
-import ClientSchema from '../models/Clients'
-import CasesData from '../models/CasesData'
 
 let Schema = mongoose.Schema
 
@@ -56,6 +53,10 @@ CasesSchema.statics.getCasesByExternalId = function (external_id) {
 
 CasesSchema.statics.search = function (query) {
   return this.find(query).populate('cases').populate('clients').populate('users').exec()
+}
+
+CasesSchema.statics.getCaseUsers = function (query) {
+  return this.find(query).populate('users')
 }
 
 CasesSchema.statics.getCaseId = function (query) {

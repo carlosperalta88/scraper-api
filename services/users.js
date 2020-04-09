@@ -23,6 +23,10 @@ class UsersService {
     return await this.users.getId(query)
   }
 
+  async getEmailById(query) {
+    return await this.users.getEmailById(query)
+  }
+
   async search(query) {
     return await this.users.search(query)
   }

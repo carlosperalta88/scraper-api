@@ -4,12 +4,10 @@ import ScraperService from '../services/scraper'
 import ScraperObserver from '../observers/Scraper'
 import ObservableInsert from '../observers/Insert'
 
-const scraper = new ScraperObserver()
-
 exports.addToScraperQueue = async (req, res) => {
   try {
     const cases = await ScraperService.rolesToScrape(req.body.query)
-    scraper.add(cases)
+    ScraperObserver.add(cases)
     res.json(cases).status(201)
   } catch (e) {
     logger.error(`couldn't add roles to queue ${e}`)
@@ -19,7 +17,7 @@ exports.addToScraperQueue = async (req, res) => {
 
 exports.executeScraper = async (req, res) => {
   try {
-    scraper.scrape()
+    ScraperObserver.scrape()
     return res.json({
       message: 'scrape started...'
     }).status(204)
@@ -39,7 +37,7 @@ exports.getQueueLength = async (req, res) => {
   }
 }
 
-scraper
+ScraperObserver
   .on('roleRemoved', ob => {
     logger.info(`${ob.role} successfully removed from queue`)
     return ob.sc.scrape()
@@ -53,7 +51,7 @@ scraper
     return
   })
   .on('failedStart', error => {
-    logger.error(error)
+    logger.info(error)
     return
   })
   .on('sent', res => {
@@ -67,9 +65,9 @@ scraper
 
 ObservableInsert
   .on('retry', async (role) => {
-    logger.info(`retrying role`)
+    logger.info(`retrying role ${role}`)
     const cases = await ScraperService.rolesToScrape({ _id: role['case_id']})
-    scraper
+    ScraperObserver
       .add(cases)
       .scrape()
     return

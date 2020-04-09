@@ -1,6 +1,5 @@
 import CasesDataModel from '../models/CasesData'
 import Cases from '../models/Cases'
-import ObservableInsert from '../observers/Insert'
 
 class CasesData {
   constructor(CasesDataModel) {
@@ -39,10 +38,50 @@ class CasesData {
   async add(req) {
     const payload = compose(this.formatDate, this.formatScraperResponse)(req)
     let [parent_case] = await Cases.getCaseId({ $and: [{ role: req.params.role.trim() }, { 'court.name': payload['court'] }] })
-    payload['case_id'] = parent_case
-    ObservableInsert.checkInsert(payload)
+    payload['case_id'] = parent_case['id']
     return await this.casesData.add(payload)
   }
+
+  async getLatest(case_id) {
+    return await this.casesData.getLatest({ case_id })
+  }
+
+  compare(newCase, oldCase) {
+    let variation = []
+    let checkProperties = ['receptor','pending_docs','cause_history','exhorts']
+    for (const property of checkProperties) {
+      if (this.didItChange(newCase[property], oldCase[property])) {
+        variation.push(property)
+      }
+    }
+
+    if (variation.length === 0) {
+      return { case_id: newCase['case_id'], variation }
+    }
+
+    return { case_id: newCase['case_id'], variation }
+  }
+
+  didItChange(propA, propB) {
+    return this.processProp(propA) > this.processProp(propB)
+  }
+
+  processProp(prop) {
+    return compose(this.getLength, this.noWS, this.toString)(prop)
+  }
+
+  toString(obj) {
+    return JSON.stringify(obj)
+  }
+
+  noWS(str) {
+    return str.replace(/\s/g, "");
+  }
+
+  getLength(str) {
+    return str.length
+  }
+
 }
 
 const compose = (...fns) => x => fns.reduceRight((y, f) => f(y), x)

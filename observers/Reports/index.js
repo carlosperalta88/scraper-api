@@ -3,6 +3,10 @@ import ReportsService from '../../services/reports'
 import request from '../../lib/api'
 
 class ObservableReport extends EventEmitter {
+  constructor() {
+    super()
+  }
+  
   async create(client) {
     try {
       const data = await ReportsService.getReport(client)
