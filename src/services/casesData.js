@@ -63,7 +63,7 @@ class CasesData {
   }
 
   didItChange(propA, propB) {
-    return this.processProp(propA) > this.processProp(propB)
+    return this.processProp(propA) !== this.processProp(propB)
   }
 
   processProp(prop) {

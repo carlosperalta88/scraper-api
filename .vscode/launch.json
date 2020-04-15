@@ -7,10 +7,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "node launch",
+      "program": "${workspaceFolder}/build/bin/www",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "nodemon",
       "runtimeExecutable": "nodemon",
       "runtimeArgs": ["--exec", "babel-node"],
-      "program": "${workspaceFolder}/bin/www",
+      "program": "${workspaceFolder}/src/bin/www",
       "restart": true,
       "console": "integratedTerminal",
       "skipFiles": [
