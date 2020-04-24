@@ -7,7 +7,7 @@ var apiV1 = require('./routes/index');
 
 var app = express();
 
-require('dotenv').config({ path: 'variables.env' })
+require('dotenv').config({ path: path.join(__dirname, 'variables.env') })
 
 app.use(morgan('combined', { stream: winston.stream }));
 app.use(express.json());
