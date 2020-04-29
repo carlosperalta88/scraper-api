@@ -2,14 +2,14 @@ process.env.NODE_ENV = 'test'
 
 import chai from 'chai'
 let expect = chai.expect
-import CasesServices from '../../../services/cases'
-import CourtsService from '../../../services/courts'
-import ClientsService from '../../../services/clients'
-import RolesService from '../../../services/roles'
-import UsersService from '../../../services/users'
-import CasesDataService from '../../../services/casesData'
-import conn from '../../../db/index'
-import CasesData from '../../../models/CasesData'
+import CasesServices from '../../../src/services/cases'
+import CourtsService from '../../../src/services/courts'
+import ClientsService from '../../../src/services/clients'
+import RolesService from '../../../src/services/roles'
+import UsersService from '../../../src/services/users'
+import CasesDataService from '../../../src/services/casesData'
+import conn from '../../../src/db/index'
+import CasesData from '../../../src/models/CasesData'
 
 describe('cases service', function() {
   before(async () => {

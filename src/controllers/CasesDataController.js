@@ -2,6 +2,7 @@ import logger from '../config/winston'
 import CasesDataService from '../services/casesData'
 import ObservableInsert from '../observers/Insert'
 import NotificationObserver from '../observers/Notifications'
+import SQSObservable from '../observers/SQS'
 
 exports.add = async (req, res) => {
   try {
@@ -36,6 +37,20 @@ ObservableInsert
 
     await NotificationObserver.add(comparison)
     return 
+  })
+
+SQSObservable
+  .on('addFromSQS', async (payload) => {
+    logger.info(`adding CaseData ${payload.role_search.role}`)
+    try {
+      const [updatedCase] = await CasesDataService.add({ body: payload, params: { role: payload.role_search[0].role } })
+      ObservableInsert.checkInsert(updatedCase)
+      logger.info(`saved ${payload.role_search[0].role}`)
+      return
+    } catch (error) {
+      logger.error(`sqs failed adding: ${error}`)
+      return
+    }
   })
 
 NotificationObserver

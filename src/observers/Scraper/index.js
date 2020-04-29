@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import request from '../../lib/api'
+import sqs from '../SQS'
 
 class ObservableScraper extends EventEmitter{
   constructor(queue = []) {
@@ -31,7 +32,7 @@ class ObservableScraper extends EventEmitter{
             this.emit('sent', { response, role })
             const idx = this.queue.indexOf(role)
             this.queue.splice(idx, 1)
-            this.emit('roleRemoved', {sc: this, role: role})
+            this.emit('roleRemoved', {sc: this.scrape, role: role})
             return this
           }
           this.emit('badResponse', response)
@@ -43,6 +44,18 @@ class ObservableScraper extends EventEmitter{
         })
       }
     this.emit('failedStart', { scraping: this.scraping, queueLength: this.queue.length })
+    return this
+  }
+
+  async sqsScrape() {
+    if (this.scraping && this.queue.length > 0) { 
+      const role = this.queue[0]
+      await sqs.send(role)
+      const idx = this.queue.indexOf(role)
+      this.queue.splice(idx, 1)
+      this.emit('roleRemoved', {sc: this.sqsScrape, role: role})
+      return this
+    }
     return this
   }
 
@@ -61,6 +74,12 @@ class ObservableScraper extends EventEmitter{
   startScraper() {
     this.scrape = true
     this.emit('resume', `Quere resumed with ${this.queue.length} items`)
+    return this
+  }
+
+  async pullSQSRoles() {
+    await sqs.receive()
+    this.emit('pull')
     return this
   }
 }
