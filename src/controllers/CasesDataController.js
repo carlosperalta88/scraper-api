@@ -56,7 +56,7 @@ SQSObservable
       logger.info(`saved ${payload.role_search[0].role}`)
       return
     } catch (error) {
-      logger.error(`sqs failed adding: ${error}`)
+      logger.error(`sqs failed adding: ${error} ${payload}`)
       return
     }
   })
