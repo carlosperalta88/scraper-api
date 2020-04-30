@@ -47,7 +47,13 @@ class SQSObservable extends EventEmitter {
         console.log(err)
         return this
       }
-      console.log(data.Messages.length)
+
+      if(!data.Messages) {
+        console.log(data)
+        return this
+      }
+
+      console.log(`Messages pulled: ${data.Messages.length}`)
       data.Messages.map((el) => {
         let caseData = JSON.parse(el.Body)
         this.emit('addFromSQS', JSON.parse(caseData['case']))
@@ -67,6 +73,10 @@ class SQSObservable extends EventEmitter {
           return this
         })
       })
+      if (data && data.Messages && data.Messages.length > 0) {
+        this.receive()
+        return this
+      }
     })
     return this
   }
