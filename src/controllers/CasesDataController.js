@@ -3,6 +3,7 @@ import CasesDataService from '../services/casesData'
 import ObservableInsert from '../observers/Insert'
 import NotificationObserver from '../observers/Notifications'
 import SQSObservable from '../observers/SQS'
+import ScraperObserver from '../observers/Scraper'
 
 exports.add = async (req, res) => {
   try {
@@ -41,6 +42,13 @@ ObservableInsert
 
 SQSObservable
   .on('addFromSQS', async (payload) => {
+    if (payload.error) {
+      logger.info(`retry ${payload.case}`)
+      ScraperObserver
+        .add(payload.case)
+        .sqsScrape()
+        return
+    }
     logger.info(`adding CaseData ${payload.role_search.role}`)
     try {
       const [updatedCase] = await CasesDataService.add({ body: payload, params: { role: payload.role_search[0].role } })

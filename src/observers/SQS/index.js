@@ -47,10 +47,11 @@ class SQSObservable extends EventEmitter {
         console.log(err)
         return this
       }
+      console.log(data.Messages.length)
       data.Messages.map((el) => {
         let caseData = JSON.parse(el.Body)
         this.emit('addFromSQS', JSON.parse(caseData['case']))
-        console.log(JSON.parse(caseData['case']))
+        // console.log(JSON.parse(caseData['case']))
         const deleteParams = {
           QueueUrl: process.env.SQS_Receive,
           ReceiptHandle: el.ReceiptHandle
@@ -61,7 +62,7 @@ class SQSObservable extends EventEmitter {
             console.log(err)
             return this
           }
-          console.log(data)
+          // console.log(data)
           console.log(`Message Deleted: ${data['ResponseMetadata']['RequestId']}`)
           return this
         })

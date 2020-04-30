@@ -95,6 +95,7 @@ SQSObservable
       return
     }
     logger.info(`sqs: ${res.MessageId}`)
+    ScraperObserver.sqsScrape()
     return
   })
 
@@ -105,5 +106,9 @@ ObservableInsert
     ScraperObserver
       .add(cases)
       .scrape()
+    
+    ScraperObserver
+      .add(cases)
+      .sqsScrape()
     return
 })
