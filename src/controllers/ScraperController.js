@@ -101,7 +101,7 @@ SQSObservable
 
 ObservableInsert
   .on('retry', async (role) => {
-    logger.info(`retrying role ${role}`)
+    logger.info(`retrying role ${role['case_id']}`)
     const cases = await ScraperService.rolesToScrape({ _id: role['case_id']})
     ScraperObserver
       .add(cases)

@@ -49,14 +49,14 @@ SQSObservable
         .sqsScrape()
         return
     }
-    logger.info(`adding CaseData ${payload.role_search.role}`)
+    logger.info(`adding CaseData ${payload.role_search[0].role}`)
     try {
       const [updatedCase] = await CasesDataService.add({ body: payload, params: { role: payload.role_search[0].role } })
       ObservableInsert.checkInsert(updatedCase)
       logger.info(`saved ${payload.role_search[0].role}`)
       return
     } catch (error) {
-      logger.error(`sqs failed adding: ${error} ${payload}`)
+      logger.error(`sqs failed adding: ${error} ${JSON.stringify(payload['role_search'])}`)
       return
     }
   })
