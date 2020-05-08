@@ -14,6 +14,7 @@ class NotificationsService {
   }
 
   async addNotification(role, changes, emails) {
+    console.log(`notification ${role}`)
     return await this.notifications({role, variations: changes, status: this.NOTIFICATION_STATUS.CREATED, emails })
   }
 

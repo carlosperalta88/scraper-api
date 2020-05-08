@@ -43,6 +43,8 @@ ObservableInsert
 SQSObservable
   .on('addFromSQS', async (payload) => {
     if (payload.error) {
+      console.log(payload)
+      if (payload.case === 'undefined') return
       logger.info(`retry ${payload.case}`)
       ScraperObserver
         .add(payload.case)

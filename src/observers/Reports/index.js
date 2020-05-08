@@ -7,9 +7,9 @@ class ObservableReport extends EventEmitter {
     super()
   }
   
-  async create(client) {
+  async create(query) {
     try {
-      const data = await ReportsService.getReport(client)
+      const data = await ReportsService.getReport(query)
       const payload = {
         json: true,
         uri: `${process.env.REPORT_URL}/generate`,
