@@ -67,29 +67,52 @@ CasesSchema.statics.add = function (items) {
   return this.insertMany(items)
 }
 
-CasesSchema.statics.buildReport = function(client) {
+CasesSchema.statics.buildReport = function(q) {
+  const qu = q.map(el => {
+    if (el.hasOwnProperty('clients')) {
+      return { clients: mongoose.Types.ObjectId(el['clients']) }
+    }
+    return el
+  })
+  const query = [{ is_active: true }].concat(qu)
+  console.log(query)
   return this.aggregate([
     {
-      $match: { $and: [{ clients: client }, { is_active: true }] }
+      $match: { $and: query }
     },
-    {
-      $lookup: {
-        from: 'casesdatas',
-        let: { case_id: '$_id' },
-        pipeline: [
-          { $match: { 
-            $expr: {
-              $eq: ['$case_id', '$$case_id']
-            }
-          } },
-          { $sort: { 'created_at': -1 } },
-          { $limit: 1 }
-        ],
-        as: 'cases'
-      }
-    },
+    lookup,
     reportAggregation
   ])
+}
+
+CasesSchema.statics.paginatedReport = function(req) {
+  const { page = 1, limit = 20 } = req.query
+  const query = [{ is_active: true }].concat(req.body.query)
+
+  return this.aggregate([
+    { $match: query },
+    { $limit: limit * 1 },
+    { $skip: (page - 1) * limit },
+    lookup,
+    reportAggregation
+  ])
+}
+
+const lookup = {
+  $lookup: {
+    from: 'casesdatas',
+    let: { case_id: '$_id' },
+    pipeline: [
+      { $match: { 
+        $expr: {
+          $eq: ['$case_id', '$$case_id']
+        }
+      } },
+      { $sort: { 'created_at': -1 } },
+      { $limit: 1 }
+    ],
+    as: 'cases'
+  }
 }
 
 const reportAggregation = { 

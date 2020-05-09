@@ -37,7 +37,9 @@ class CasesData {
 
   async add(req) {
     const payload = compose(this.formatDate, this.formatScraperResponse)(req)
-    let [parent_case] = await Cases.getCaseId({ $and: [{ role: req.params.role.trim() }, { 'court.name': payload['court'] }] })
+    const re = /\s\w/gm
+    const role = (re.test(req.params.role) ? req.params.role.split(' ')[0] : req.params.role)
+    let [parent_case] = await Cases.getCaseId({ $and: [{ role: role.trim() }, { 'court.name': payload['court'] }] })
     payload['case_id'] = parent_case['id']
     return await this.casesData.add(payload)
   }

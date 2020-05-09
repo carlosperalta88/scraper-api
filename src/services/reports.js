@@ -41,9 +41,9 @@ class Reports {
     return await this.reports.get(query)
   }
 
-  async getReport(clientExternalId) {
-    const [ client ]= await this.clients.getClientsId({ 'external_id': clientExternalId})
-    const report = await CasesModel.buildReport(client._id)
+  async getReport(query) {
+    // const [ client ]= await this.clients.getClientsId({ 'external_id': clientExternalId})
+    const report = await CasesModel.buildReport(query)
     return this.applySort(report)
   }
 }

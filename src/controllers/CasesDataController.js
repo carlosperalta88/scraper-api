@@ -2,13 +2,15 @@ import logger from '../config/winston'
 import CasesDataService from '../services/casesData'
 import ObservableInsert from '../observers/Insert'
 import NotificationObserver from '../observers/Notifications'
+import SQSObservable from '../observers/SQS'
+import ScraperObserver from '../observers/Scraper'
 
 exports.add = async (req, res) => {
   try {
     const [updatedCase] = await CasesDataService.add(req)
     logger.info(`${req.params.role} saved`)
     ObservableInsert.checkInsert(updatedCase)
-    res.json(updatedCase).status(204)
+    res.json({ case: req.params.role }).status(204)
     return 
   } catch (error) {
     logger.info(`failed saving the cause ${error}`)
@@ -36,6 +38,29 @@ ObservableInsert
 
     await NotificationObserver.add(comparison)
     return 
+  })
+
+SQSObservable
+  .on('addFromSQS', async (payload) => {
+    if (payload.error) {
+      console.log(payload)
+      if (payload.case === 'undefined') return
+      logger.info(`retry ${payload.case}`)
+      ScraperObserver
+        .add(payload.case)
+        .sqsScrape()
+        return
+    }
+    logger.info(`adding CaseData ${payload.role_search[0].role}`)
+    try {
+      const [updatedCase] = await CasesDataService.add({ body: payload, params: { role: payload.role_search[0].role } })
+      ObservableInsert.checkInsert(updatedCase)
+      logger.info(`saved ${payload.role_search[0].role}`)
+      return
+    } catch (error) {
+      logger.error(`sqs failed adding: ${error} ${JSON.stringify(payload['role_search'])}`)
+      return
+    }
   })
 
 NotificationObserver

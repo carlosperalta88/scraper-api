@@ -2,8 +2,8 @@ process.env.NODE_ENV = 'test'
 
 import chai from 'chai'
 let expect = chai.expect
-import RolesService from '../../../services/roles'
-import conn from '../../../db/index'
+import RolesService from '../../../src/services/roles'
+import conn from '../../../src/db/index'
 
 describe('roles service', () => {
   before((done) => {
