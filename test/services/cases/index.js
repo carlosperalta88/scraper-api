@@ -9,7 +9,6 @@ import RolesService from '../../../src/services/roles'
 import UsersService from '../../../src/services/users'
 import CasesDataService from '../../../src/services/casesData'
 import conn from '../../../src/db/index'
-import CasesData from '../../../src/models/CasesData'
 
 describe('cases service', function() {
   before(async () => {
@@ -411,6 +410,1719 @@ describe('cases service', function() {
     .then(result => {
       expect(result).not.to.be.a('null')
     })
+  })
+
+  it('should compare cases equal cases', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseData)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).to.be.empty
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with more history', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+          {
+            folio:"45",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveídow",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation'][0]).to.equal('cause_history')
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with less history', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation'][0]).to.equal('cause_history')
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with more exhorts', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation'][0]).to.equal('exhorts')
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with less exhorts', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation'][0]).to.equal('exhorts')
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with more pending docs', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: ['one doc'] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation'][0]).to.equal('pending_docs')
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with different receptor data', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Carlos Peralta receptor' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation'][0]).to.equal('receptor')
+    expect(result['case_id']).to.equal('123')
+  })
+
+  it('should compare cases with more than one difference', () => {
+    var caseData = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: [] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Causa no presenta retiro de Receptor.' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+
+    var caseDataB = {
+      cause_history: [
+        { book: '1 Principal', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', history: [
+          {
+            folio:"47",
+            doc: "",
+            attachment: "",
+            stage: "Notificación demanda y su proveído",
+            procedure: "Resolución",
+            procedure_description: "Archivo del expediente en el Tribunal",
+            procedure_date: "05/08/2019",
+            document_page: "2"
+          },
+        ] }
+      ],
+      exhorts: [
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-808-2018',
+          exhort_order_date: '05/04/2018',
+          exhort_added_date: '05/04/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-307-2019',
+          exhort_order_date: '02/02/2019',
+          exhort_added_date: '02/02/2019',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Generado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2562-2018',
+          exhort_order_date: '10/10/2018',
+          exhort_added_date: '10/10/2018',
+          court_destined: '2º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        },
+        {
+          role_origin: 'C-546-2018',
+          exhort_type: 'Exhorto',
+          role_destination: 'E-2054-2018',
+          exhort_order_date: '13/08/2018',
+          exhort_added_date: '13/08/2018',
+          court_destined: '1º Juzgado Civil de Rancagua',
+          exhort_status: 'Recepcionado',
+          role_destination_detail: [
+            { doc: "",
+              date: "15/05/2018",
+              reference: "Folio:5 Diligenciado con resultado negativo",
+              procedure: "Resolución"
+            }
+          ]
+        }
+      ],
+      pending_docs: [
+        { book: '1 Principal', docs: ['this is a test'] },
+        { book: '2 Apremio Ejecutivo Obligación de Dar', docs: [] }
+      ],
+      receptor: [ { book: 'Carlos Peralta receptor' } ],
+      role_search: [
+        {
+          role: 'C-546-2018 ',
+          date: '08/01/2018',
+          cover: 'TANNER SERVICIOS FINANCIEROS S.A./MADARIAGA',
+          court: '27º Juzgado Civil de Santiago'
+        }
+      ],
+      status: 'Archivada',
+      case_id: '123'
+    }
+    const result = CasesDataService.compare(caseData, caseDataB)
+    expect(result).not.to.be.a('null')
+    expect(result).to.have.all.keys('case_id', 'variation')
+    expect(result['variation']).not.to.be.empty
+    expect(result['variation']).to.be.an('array').that.include('exhorts', 'pending_docs', 'receptor')
+    expect(result['case_id']).to.equal('123')
   })
 
   it('should deactivate cases', () => {

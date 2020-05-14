@@ -51,6 +51,7 @@ SQSObservable
         .sqsScrape()
         return
     }
+    if (payload.case) return
     logger.info(`adding CaseData ${payload.role_search[0].role}`)
     try {
       const [updatedCase] = await CasesDataService.add({ body: payload, params: { role: payload.role_search[0].role } })

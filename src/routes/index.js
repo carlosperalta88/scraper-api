@@ -8,6 +8,7 @@ var users = require('./users');
 var roles = require('./roles');
 var casesData = require('./casesData');
 var reports = require('./reports');
+var executions = require('./executions')
 
 router.use('/cases', cases);
 router.use('/courts', courts);
@@ -16,6 +17,7 @@ router.use('/clients', clients);
 router.use('/users', users);
 router.use('/roles', roles);
 router.use('/cases-data', casesData);
-router.use('/reports', reports)
+router.use('/reports', reports);
+router.use('/executions', executions);
 
 module.exports = router;
