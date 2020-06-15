@@ -12,3 +12,11 @@ class ExecutionsObserver extends EventEmitter {
     return this
   }
 }
+
+const executions = new ExecutionsObserver()
+
+executions.on('rolesAdded', function(eid) {
+  console.log(`Execution id: ${eid}`)
+})
+
+export default executions
