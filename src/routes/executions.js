@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var authController = require('../controllers/AuthController')
-var executionsController = require('../controllers/executionsController')
+var executionsController = require('../controllers/ExecutionsController')
 
 router.post('/', authController.APIKey, executionsController.create)
 router.get('/:id', authController.APIKey, executionsController.get)
