@@ -31,14 +31,3 @@ exports.exportReport = async (req, res) => {
     res.send(error).status(500)
   }
 }
-
-reportObserver
-  .on('reportResponse', (response) => {
-    logger.info(response)
-    return
-  })
-  .on('reportsError', (error) => {
-    logger.info('reportsError')
-    logger.error(error)
-    return
-  })

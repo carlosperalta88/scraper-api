@@ -1,5 +1,4 @@
 import logger from '../config/winston'
-import request from '../lib/api'
 import CaseService from '../services/cases'
 
 exports.addCases = async (req, res) => {

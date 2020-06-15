@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import logger from '../../config/winston'
 import ReportsService from '../../services/reports'
 import request from '../../lib/api'
 
@@ -26,5 +27,18 @@ class ObservableReport extends EventEmitter {
     }
   }
 }
+
+const report = new ObservableReport()
+
+report
+  .on('reportResponse', (response) => {
+    logger.info(response)
+    return
+  })
+  .on('reportsError', (error) => {
+    logger.info('reportsError')
+    logger.error(error)
+    return
+  })
 
 module.exports = new ObservableReport()

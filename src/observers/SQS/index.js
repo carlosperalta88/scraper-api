@@ -1,5 +1,9 @@
 import sqs from '../../lib/sqs'
+import logger from '../../config/winston'
 import { EventEmitter } from 'events'
+import ScraperObserver from '../Scraper'
+import ObservableInsert from '../Insert'
+import CasesDataService from '../../services/casesData'
 
 class SQSObservable extends EventEmitter {
   constructor() {
@@ -82,4 +86,40 @@ class SQSObservable extends EventEmitter {
   }
 }
 
-export default new SQSObservable()
+const sqsObservable = new SQSObservable()
+
+sqsObservable
+  .on('addFromSQS', async (payload) => {
+    if (payload.error) {
+      logger.info(payload)
+      if (payload.case === 'undefined') return
+      logger.info(`retry ${payload.case}`)
+      ScraperObserver
+        .add(payload.case)
+        .sqsScrape()
+        return
+    }
+    if (payload.case) return
+    //ONLY FOR LOCAL USE
+    logger.info(`adding CaseData ${payload.role_search[0].role}`)
+    try {
+      const [updatedCase] = await CasesDataService.add({ body: payload, params: { role: payload.role_search[0].role } })
+      ObservableInsert.checkInsert(updatedCase)
+      logger.info(`saved ${payload.role_search[0].role}`)
+      return
+    } catch (error) {
+      logger.error(`sqs failed adding: ${error} ${JSON.stringify(payload['role_search'])}`)
+      return
+    }
+  })
+  .on('sqsSent', (res) => {
+    if (!res.MessageId) {
+      logger.error(`Error: ${res}`)
+      return
+    }
+    logger.info(`sqs: ${res.MessageId}`)
+    ScraperObserver.sqsScrape()
+    return
+  })
+
+export default sqsObservable

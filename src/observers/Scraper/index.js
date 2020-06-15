@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import logger from '../../config/winston'
 import request from '../../lib/api'
 import sqs from '../SQS'
 
@@ -8,6 +9,7 @@ class ObservableScraper extends EventEmitter{
     this.delay = 5
     this.queue = queue
     this.scraping = true
+    this.currentSlice = []
   }
 
   add(elements) {
@@ -48,11 +50,13 @@ class ObservableScraper extends EventEmitter{
   }
 
   async sqsScrape() {
-    if (this.scraping && this.queue.length > 0) { 
-      const role = this.queue[0]
+    this.currentSlice = this.currentSlice.concat(this.queue.slice('', process.env.UPPER_LIMIT))
+    if (this.scraping && this.currentSlice.length > 0) { 
+      const role = this.currentSlice[0]
       await sqs.send(role)
-      const idx = this.queue.indexOf(role)
+      const idx = this.currentSlice.indexOf(role)
       this.queue.splice(idx, 1)
+      this.currentSlice.splice(idx, 1)
       this.emit('roleRemoved', {sc: this.sqsScrape, role: role})
       return this
     }
@@ -84,4 +88,32 @@ class ObservableScraper extends EventEmitter{
   }
 }
 
-export default new ObservableScraper()
+const scraper = new ObservableScraper()
+
+scraper
+  .on('roleRemoved', ob => {
+    logger.info(`${ob.role} successfully removed from queue`)
+    return ob.sc()
+  })
+  .on('badResponse', response => {
+    logger.error(response)
+    return
+  })
+  .on('sentFailed', error => {
+    logger.error(error)
+    return
+  })
+  .on('failedStart', error => {
+    logger.info(error)
+    return
+  })
+  .on('sent', res => {
+    logger.info(res)
+    return
+  })
+  .on('elementsAdded', (el) => {
+    logger.info(`added ${el} cases`)
+    return 
+  })
+
+export default scraper

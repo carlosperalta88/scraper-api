@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import logger from '../../config/winston'
 import NotificationService from '../../services/notifications'
 import CasesService from '../../services/cases'
 
@@ -20,4 +21,16 @@ class ObservableNotifications extends EventEmitter {
   }
 }
 
-export default new ObservableNotifications()
+const notification = new ObservableNotifications()
+
+notification
+  .on('created', (notification) => {
+    logger.info(`notification id ${notification['_id']} created`)
+    return
+  })
+  .on('error', e => {
+    logger.error(`failed notification creation ${e}`)
+    return
+  })
+
+export default notification

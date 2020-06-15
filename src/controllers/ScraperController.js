@@ -2,8 +2,6 @@
 import logger from '../config/winston'
 import ScraperService from '../services/scraper'
 import ScraperObserver from '../observers/Scraper'
-import ObservableInsert from '../observers/Insert'
-import SQSObservable from '../observers/SQS'
 
 exports.addToScraperQueue = async (req, res) => {
   try {
@@ -61,54 +59,3 @@ exports.pullFromSQS = async (req, res) => {
     return res.status(500).send({ error: e.name, message: e.message })
   }
 }
-
-ScraperObserver
-  .on('roleRemoved', ob => {
-    logger.info(`${ob.role} successfully removed from queue`)
-    return ob.sc()
-  })
-  .on('badResponse', response => {
-    logger.error(response)
-    return
-  })
-  .on('sentFailed', error => {
-    logger.error(error)
-    return
-  })
-  .on('failedStart', error => {
-    logger.info(error)
-    return
-  })
-  .on('sent', res => {
-    logger.info(res)
-    return
-  })
-  .on('elementsAdded', (el) => {
-    logger.info(`added ${el} cases`)
-    return 
-  })
-  
-SQSObservable
-  .on('sqsSent', (res) => {
-    if (!res.MessageId) {
-      logger.error(`Error: ${res}`)
-      return
-    }
-    logger.info(`sqs: ${res.MessageId}`)
-    ScraperObserver.sqsScrape()
-    return
-  })
-
-ObservableInsert
-  .on('retry', async (role) => {
-    logger.info(`retrying role ${role['case_id']}`)
-    const cases = await ScraperService.rolesToScrape({ _id: role['case_id']})
-    ScraperObserver
-      .add(cases)
-      .scrape()
-    
-    ScraperObserver
-      .add(cases)
-      .sqsScrape()
-    return
-})

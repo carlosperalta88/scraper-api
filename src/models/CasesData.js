@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
-let Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-let CasesDataSchema = new Schema({
+const CasesDataSchema = new Schema({
   "case_id": { type: mongoose.Schema.ObjectId, required: true },
   "cover": { type: String },
   "date": Date,
