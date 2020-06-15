@@ -1,5 +1,6 @@
 import logger from '../config/winston'
 import executionService from '../services/executions'
+import ExecutionObserver from '../observers/Executions'
 
 exports.create = async (req, res) => {
   try {
