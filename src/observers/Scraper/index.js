@@ -9,7 +9,7 @@ class ObservableScraper extends EventEmitter{
     this.delay = 5
     this.queue = queue
     this.scraping = true
-    this.currentSlice = []
+    this.count = 0
   }
 
   add(elements) {
@@ -49,18 +49,19 @@ class ObservableScraper extends EventEmitter{
     return this
   }
 
-  async sqsScrape() {
-    this.currentSlice = this.currentSlice.concat(this.queue.slice('', process.env.UPPER_LIMIT))
-    if (this.scraping && this.currentSlice.length > 0) { 
-      const role = this.currentSlice[0]
+  async sqsScrape(ctx) {
+    let self = ctx || this
+    if (self.scraping && self.queue.length > 0 && self.count < process.env.UPPER_LIMIT) { 
+      const role = self.queue[0]
       await sqs.send(role)
-      const idx = this.currentSlice.indexOf(role)
-      this.queue.splice(idx, 1)
-      this.currentSlice.splice(idx, 1)
-      this.emit('roleRemoved', {sc: this.sqsScrape, role: role})
-      return this
+      const idx = self.queue.indexOf(role)
+      self.queue.splice(idx, 1)
+      self.count+=1
+      self.emit('roleRemoved', {sc: self.sqsScrape, role: role, context: self})
+      return self
     }
-    return this
+    self.count = 0
+    return self
   }
 
   removeFromQueue(caseString) {
@@ -91,9 +92,10 @@ class ObservableScraper extends EventEmitter{
 const scraper = new ObservableScraper()
 
 scraper
-  .on('roleRemoved', ob => {
+  .on('roleRemoved', function (ob) {
     logger.info(`${ob.role} successfully removed from queue`)
-    return ob.sc()
+    const ctx = ob.context
+    return ob.sc(ctx)
   })
   .on('badResponse', response => {
     logger.error(response)
