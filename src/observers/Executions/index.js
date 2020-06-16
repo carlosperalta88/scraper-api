@@ -7,7 +7,7 @@ class ExecutionsObserver extends EventEmitter {
   }
 
   async add (execution, data) {
-    await ExecutionService.patch(execution['_id'], data)
+    await ExecutionService.patch(execution['_id'], data).catch(err => console.error(err))
     this.emit('rolesAdded', execution['_id'])
     return this
   }

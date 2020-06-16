@@ -6,12 +6,12 @@ const ExecutionSchema = new Schema({
   "role_external_ids": [{ type: String, required: false, unique: false }]
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
-ExecutionSchema.statics.create = function() {
-  return this.create()
+ExecutionSchema.statics.create = async function() {
+  return await new Executions().save()
 }
 
 ExecutionSchema.statics.update = function(execution_id, roles) {
-  return this.update({ _id: execution_id }, 
+  return this.updateOne({ _id: execution_id }, 
     { $push: {
       role_external_ids: {
         $each: roles

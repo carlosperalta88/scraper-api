@@ -5,7 +5,7 @@ import ExecutionObserver from '../observers/Executions'
 exports.create = async (req, res) => {
   try {
     const executionData = await executionService.create()
-    ExecutionObserver.add(executionData, req.body)
+    ExecutionObserver.add(executionData, req.body.ids)
     res.json(executionData).status(201)
   } catch (error) {
     logger.info(`Error: adding execution ${error}`)
