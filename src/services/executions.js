@@ -18,7 +18,7 @@ class ExecutionsService {
   }
 
   async start (id) {
-    const execution = await Executions.get(id)
+    const [execution] = await Executions.get(id)
     const cases = await ScraperService.rolesToScrape({ "$and": [ { "external_id": { "$in": execution['role_external_ids'] } } ] })
     ScraperObserver.add(cases)
     return execution

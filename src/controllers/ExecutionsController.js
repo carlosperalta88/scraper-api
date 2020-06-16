@@ -27,7 +27,7 @@ exports.get = async (req, res) => {
 
 exports.edit = async (req, res) => {
   try {
-    const executionData = await executionService.patch(req.params.id, req.body)
+    const executionData = await executionService.patch(req.params.id, req.body.ids)
     res.json(executionData).status(200)
   } catch (error) {
     logger.info(`Error: adding roles to execution ${error}`)
