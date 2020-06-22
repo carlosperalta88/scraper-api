@@ -36,7 +36,15 @@ class ScraperService {
   }
 
   async getRolesToScrape(query) {
-    return await Cases.search(query).then(x => x)
+    return new Promise(async (resolve, reject) => {
+      const roles = await Cases.bigSearch(query)
+      const arr = []
+      roles.on('data', (role) => arr.push(role))
+      roles.on('end', () => {
+        console.log('here')
+        resolve(arr)
+      })
+    })
   }
 
   async getQueueLength(queue) {

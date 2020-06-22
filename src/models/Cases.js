@@ -67,6 +67,10 @@ CasesSchema.statics.add = function (items) {
   return this.insertMany(items)
 }
 
+CasesSchema.statics.bigSearch = function (query) {
+  return this.find(query).cursor()
+}
+
 CasesSchema.statics.buildReport = function(q) {
   const qu = q.map(el => {
     if (el.hasOwnProperty('clients')) {
