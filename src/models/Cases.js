@@ -128,6 +128,7 @@ const reportAggregation = {
   external_id: 1,
   cover: 1,
   date: 1,
+  scraper_executed: '$cases.created_at',
   last_reception: {
     $let: {
       vars: {

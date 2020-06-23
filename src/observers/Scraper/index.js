@@ -51,7 +51,8 @@ class ObservableScraper extends EventEmitter{
 
   async sqsScrape(ctx) {
     let self = ctx || this
-    if (self.scraping === false && self.queue.length > 0 && self.count < process.env.UPPER_LIMIT) { 
+    console.log(self.scraping, self.queue.length, self.count, process.env.UPPER_LIMIT)
+    if (self.scraping === true && self.queue.length > 0 && self.count < process.env.UPPER_LIMIT) { 
       const role = self.queue[0]
       await sqs.send(role)
       const idx = self.queue.indexOf(role)
