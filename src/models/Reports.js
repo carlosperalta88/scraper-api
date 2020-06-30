@@ -12,9 +12,5 @@ ReportsSchema.statics.get = function(query) {
   return this.find(query).populate('client')
 }
 
-ReportsSchema.statics.create = function(client, data) {
-  return this.create({ client, data })
-}
-
 const Reports = mongoose.model('Reports', ReportsSchema)
 export default Reports

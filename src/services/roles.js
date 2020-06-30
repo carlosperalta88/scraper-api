@@ -9,8 +9,8 @@ class RolesService {
     return await this.roles.search({ name })
   }
 
-  async add(body) {
-    return await this.roles.add(body)
+  async add(query) {
+    return await this.roles.create(query)
   }
 
 }

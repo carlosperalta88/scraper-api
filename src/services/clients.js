@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import Clients from '../models/Clients'
 
 class ClientsService {
@@ -5,23 +6,23 @@ class ClientsService {
     this.clients = Clients
   }
 
-  async get(external_id) {
-    return await this.clients.get(external_id)
+  async get(externalId) {
+    return await this.clients.search({external_id: externalId})
   }
 
   async add(body) {
-    return await this.clients.add(body)
+    return await this.clients.create(body)
   }
 
   async search(query) {
     return await this.clients.search(query)
   }
 
-  async delete(external_id) {
-    return await this.clients.delete(external_id)
+  async delete(externalId) {
+    return await this.clients.delete(externalId)
   }
-  async update(external_id, body) {
-    return await this.clients.update(external_id, body)
+  async update(externalId, body) {
+    return await this.clients.update(externalId, body)
   }
 }
 

@@ -10,7 +10,7 @@ exports.create = async (req, res) => {
   } catch (error) {
     logger.info(`Error: adding execution ${error}`)
     res.send(error).status(500)
-    return  
+    return
   }
 }
 
@@ -21,29 +21,33 @@ exports.get = async (req, res) => {
   } catch (error) {
     logger.info(`Error: getting execution ${error}`)
     res.send(error).status(500)
-    return  
+    return
   }
 }
 
 exports.edit = async (req, res) => {
   try {
-    const executionData = await executionService.patch(req.params.id, req.body.ids)
+    const executionData =
+    await executionService.patch(req.params.id, req.body.ids)
     res.json(executionData).status(200)
   } catch (error) {
     logger.info(`Error: adding roles to execution ${error}`)
     res.send(error).status(500)
-    return 
+    return
   }
 }
 
 exports.start = async (req, res) => {
   try {
-    const execution = await executionService.start(req.params.id)
+    const pagination =
+    {limit: req.params.limit || 20, page: req.params.page || 1}
+
+    const execution = await executionService.start(req.params.id, pagination)
     res.json(execution).status(200)
   } catch (error) {
     logger.info(`Error: starting execution ${error}`)
     res.send(error).status(500)
-    return 
+    return
   }
 }
 

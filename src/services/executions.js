@@ -10,15 +10,15 @@ class ExecutionsService {
   }
 
   async get (id) {
-    return await Executions.get(id)
+    return await Executions.search({ _id: id})
   }
 
   async patch (id, data) {
     return await Executions.update(id, data)
   }
 
-  async start (id) {
-    const [execution] = await Executions.get(id)
+  async start (id, pagination) {
+    const [execution] = await Executions.search({ _id: id}, pagination)
     const cases = await ScraperService.rolesToScrape({ "$and": [ { "external_id": { "$in": execution['role_external_ids'] } } ] })
     ScraperObserver.add(cases)
     return execution
