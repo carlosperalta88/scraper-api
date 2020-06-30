@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import Courts from '../models/Courts'
 
 class CourtsService {

@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 // role*court_name
 import Cases from '../models/Cases'
 import request from '../lib/api'
@@ -9,14 +10,14 @@ class ScraperService {
   bodyBuild(item) {
     return encodeURI(`${item['role']}*${item['court']['name']}`)
   }
-  
+
   addCasesPayloadBuilder(cases) {
     return {
       json: true,
       uri: `${process.env.SCRAPER_URL}/add`,
       method: 'POST',
       body: {
-        roles: cases.map(el => this.bodyBuild(el))
+        roles: cases.map((el) => this.bodyBuild(el)),
       }}
   }
 
@@ -32,7 +33,7 @@ class ScraperService {
   }
 
   formatRolesToScrape(cases) {
-    return cases.map(el => this.bodyBuild(el))
+    return cases.map((el) => this.bodyBuild(el))
   }
 
   async getRolesToScrape(query) {
@@ -51,12 +52,10 @@ class ScraperService {
     const payload = {
       method: 'GET',
       json: true,
-      uri: `${process.env.SCRAPER_URL}/count?name=${queue}`
+      uri: `${process.env.SCRAPER_URL}/count?name=${queue}`,
     }
     return await request.do(payload)
   }
 }
-
-const compose = (...fns) => x => fns.reduceRight((y, f) => f(y), x)
 
 module.exports = new ScraperService()
