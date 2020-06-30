@@ -58,7 +58,7 @@ class ObservableScraper extends EventEmitter {
       self.queue.length > 0 &&
       self.count < process.env.UPPER_LIMIT) {
       const role = self.queue[0]
-      // await sqs.send(role)
+      await sqs.send(role)
       const idx = self.queue.indexOf(role)
       self.queue.splice(idx, 1)
       self.count+=1
