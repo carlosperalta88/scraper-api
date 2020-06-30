@@ -19,7 +19,7 @@ class ExecutionsService {
   }
 
   slicer(array, size) {
-    if (!arra) return []
+    if (!array) return []
     const ch = array.slice(0, size)
     if (!ch.length) return array
     return [ch].concat(this.slicer(array.slice(size, array.length), size))

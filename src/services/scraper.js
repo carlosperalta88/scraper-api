@@ -42,7 +42,6 @@ class ScraperService {
       const arr = []
       roles.on('data', (role) => arr.push(role))
       roles.on('end', () => {
-        console.log('here')
         resolve(arr)
       })
     })

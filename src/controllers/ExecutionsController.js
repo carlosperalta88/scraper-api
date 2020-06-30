@@ -39,8 +39,8 @@ exports.edit = async (req, res) => {
 
 exports.start = async (req, res) => {
   try {
-    const pagination =
-    {limit: req.params.limit || 20, page: req.params.page || 1}
+    const pagination = {limit: req.query.limit || 20,
+      page: req.query.page || 1}
 
     const execution = await executionService.start(req.params.id, pagination)
     res.json(execution).status(200)
