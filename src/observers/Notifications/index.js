@@ -1,4 +1,6 @@
-import { EventEmitter } from 'events'
+/* eslint-disable require-jsdoc */
+import {EventEmitter} from 'events'
+import logger from '../../config/winston'
 import NotificationService from '../../services/notifications'
 import CasesService from '../../services/cases'
 
@@ -9,8 +11,9 @@ class ObservableNotifications extends EventEmitter {
 
   async add(payload) {
     try {
-      const emails = await CasesService.getCaseUsers({ _id: payload['case_id']})
-      const notification = await NotificationService.addNotification(payload['case_id'], payload['variation'], emails)
+      const emails = await CasesService.getCaseUsers({_id: payload['case_id']})
+      const notification = await NotificationService.addNotification(
+          payload['case_id'], payload['variation'], emails)
       this.emit('created', notification)
       return this
     } catch (error) {
@@ -20,4 +23,16 @@ class ObservableNotifications extends EventEmitter {
   }
 }
 
-export default new ObservableNotifications()
+const notification = new ObservableNotifications()
+
+notification
+    .on('created', (notification) => {
+      logger.info(`notification id ${notification['_id']} created`)
+      return
+    })
+    .on('error', (e) => {
+      logger.error(`failed notification creation ${e}`)
+      return
+    })
+
+export default notification

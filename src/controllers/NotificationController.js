@@ -3,14 +3,16 @@ import NotificationService from '../services/notifications'
 
 exports.notify = async (req, res, next) => {
   try {
-    let emails = res.locals.storedVersion.users.map((user) => {
+    const emails = res.locals.storedVersion.users.map((user) => {
       return user.email
     })
-    
-    await NotificationService.addNotification(req.body.role, res.locals.caseDiff, emails)
-    next() 
+
+    await NotificationService
+        .addNotification(req.body.role, res.locals.caseDiff, emails)
+    next()
   } catch (error) {
-    logger.info(`Couldn't create notification for role ${req.body.role} ${error}`)
+    logger.info(`Couldn't create notification for role 
+    ${req.body.role} ${error}`)
     next()
   }
 }

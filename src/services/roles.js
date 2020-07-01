@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import Roles from '../models/Roles'
 
 class RolesService {
@@ -6,13 +7,12 @@ class RolesService {
   }
 
   async get(name) {
-    return await this.roles.search({ name })
+    return await this.roles.search({name})
   }
 
-  async add(body) {
-    return await this.roles.add(body)
+  async add(query) {
+    return await this.roles.create(query)
   }
-
 }
 
 module.exports = new RolesService(Roles)

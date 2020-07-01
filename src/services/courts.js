@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import Courts from '../models/Courts'
 
 class CourtsService {
@@ -6,7 +7,7 @@ class CourtsService {
   }
 
   async add(courts) {
-    return await this.courts.add(courts)
+    return await this.courts.create(courts)
   }
 
   async search(query) {

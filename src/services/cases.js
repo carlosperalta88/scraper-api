@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import Cases from '../models/Cases'
 import CasesData from '../models/CasesData'
 import CourtSchema from '../models/Courts'
@@ -11,27 +12,28 @@ class CaseService {
   }
 
   async add(cases) {
-    const bla = Promise.all(cases.map(async item => this.caseCreator(item)))
-    .then(async (items) => {
-      const res = await this.cases.add(items)
-      Promise.resolve(res)
-      return res
-    })
-    .catch((e) => {
-      Promise.reject(e)
-    })
-    return bla.then(x => x).catch(e => console.log(e))
+    const bla = Promise.all(cases.map(async (item) => this.caseCreator(item)))
+        .then(async (items) => {
+          const res = await this.cases.create(items)
+          Promise.resolve(res)
+          return res
+        })
+        .catch((e) => {
+          Promise.reject(e)
+        })
+    return bla.then((x) => x).catch((e) => console.log(e))
   }
 
   async caseCreator(cas) {
-    [cas['court']] = await CourtSchema.search({ external_id: cas['court_id'] })
+    [cas['court']] = await CourtSchema.search({external_id: cas['court_id']})
     delete cas['court_id']
 
-    const clients = await ClientSchema.getClientsId({ external_id: { $in: cas['clients'] } })
-    cas['clients'] = clients.map(el => el['_id'])
+    const clients = await ClientSchema.getClientsId(
+        {external_id: {$in: cas['clients']}})
+    cas['clients'] = clients.map((el) => el['_id'])
 
-    const users = await UserService.getIdBySearch({ email: { $in: cas['emails'] } })
-    cas['users'] = users.map(el => el['_id'])
+    const users = await UserService.getIdBySearch({email: {$in: cas['emails']}})
+    cas['users'] = users.map((el) => el['_id'])
     delete cas['emails']
 
     cas['is_active'] = true
@@ -39,8 +41,8 @@ class CaseService {
     return cas
   }
 
-  async deleteManyByExternalId(external_ids) {
-    return await this.cases.deleteManyByExternalId(external_ids)
+  async deleteManyByExternalId(externalIds) {
+    return await this.cases.deleteManyByExternalId(externalIds)
   }
 
   async search(query) {
@@ -48,24 +50,22 @@ class CaseService {
   }
 
   async updateUsers(query, emails) {
-    const users = await UserService.getIdBySearch({ email: { $in: emails } })
-    const usersId = users.map(el => el['_id'])
+    const users = await UserService.getIdBySearch({email: {$in: emails}})
+    const usersId = users.map((el) => el['_id'])
     return await this.cases.updateUsers(query, usersId)
   }
 
   async updateClients(query, clientsEI) {
-    const clients = await ClientSchema.getClientsId({ external_id: { $in: clientsEI } })
-    const clientsId = clients.map(el => el['_id'])
+    const clients = await ClientSchema.getClientsId(
+        {external_id: {$in: clientsEI}})
+    const clientsId = clients.map((el) => el['_id'])
     return await this.cases.updateClients(query, clientsId)
   }
 
   async getCaseUsers(query) {
     const users = await this.cases.getCaseUsers(query)
-    return users.map(el => el.email)
+    return users.map((el) => el.email)
   }
-
 }
-
-const compose = (...fns) => x => fns.reduceRight((y, f) => f(y), x)
 
 module.exports = new CaseService(Cases, CasesData)

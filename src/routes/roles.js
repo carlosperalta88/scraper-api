@@ -1,6 +1,6 @@
-var express = require('express')
-var router = express.Router()
-var rolesController = require('../controllers/RolesController')
+const express = require('express')
+const router = express.Router()
+const rolesController = require('../controllers/RolesController')
 
 router.get('/:name', rolesController.get)
 router.post('/add', rolesController.add)

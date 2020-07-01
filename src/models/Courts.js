@@ -1,18 +1,13 @@
 import mongoose from 'mongoose'
-let Schema = mongoose.Schema
+const Schema = mongoose.Schema
+import basicMethods from '../lib/basic-model-methods'
 
-let CourtsSchema = new Schema({
-  name: { type: String, required: true },
-  external_id: { type: Number, require: true, unique: false}
+const CourtsSchema = new Schema({
+  name: {type: String, required: true},
+  external_id: {type: Number, require: true, unique: false},
 })
 
-CourtsSchema.statics.add = function(courts) {
-  return this.insertMany(courts)
-}
-
-CourtsSchema.statics.search = function(query) {
-  return this.find(query)
-}
+CourtsSchema.plugin(basicMethods)
 
 const Courts = mongoose.model('Courts', CourtsSchema)
 export default Courts
