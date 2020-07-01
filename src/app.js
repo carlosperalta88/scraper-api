@@ -1,17 +1,17 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var morgan = require('morgan');
-var winston = require('./config/winston');
-var apiV1 = require('./routes/index');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
+const winston = require('./config/winston');
+const apiV1 = require('./routes/index');
 
-var app = express();
+const app = express();
 
-require('dotenv').config({ path: path.join(process.cwd(), 'variables.env') })
+require('dotenv').config({path: path.join(process.cwd(), 'variables.env')})
 
-app.use(morgan('combined', { stream: winston.stream }));
+app.use(morgan('combined', {stream: winston.stream}));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
