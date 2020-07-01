@@ -1,7 +1,7 @@
-var express = require('express')
-var router = express.Router()
-var authController = require('../controllers/AuthController')
-var usersController = require('../controllers/UsersController')
+const express = require('express')
+const router = express.Router()
+const authController = require('../controllers/AuthController')
+const usersController = require('../controllers/UsersController')
 
 router.get('/:email', authController.APIKey, usersController.get)
 router.post('/add', authController.APIKey, usersController.add)

@@ -1,7 +1,7 @@
-var express = require('express')
-var router = express.Router()
-var authController = require('../controllers/AuthController')
-var courtsController = require('../controllers/CourtsController')
+const express = require('express')
+const router = express.Router()
+const authController = require('../controllers/AuthController')
+const courtsController = require('../controllers/CourtsController')
 
 router.post('/add', authController.APIKey, courtsController.addCourts)
 router.post('/', courtsController.getCourts)

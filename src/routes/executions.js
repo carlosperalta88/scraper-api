@@ -1,7 +1,7 @@
-var express = require('express')
-var router = express.Router()
-var authController = require('../controllers/AuthController')
-var executionsController = require('../controllers/ExecutionsController')
+const express = require('express')
+const router = express.Router()
+const authController = require('../controllers/AuthController')
+const executionsController = require('../controllers/ExecutionsController')
 
 router.post('/', authController.APIKey, executionsController.create)
 router.get('/:id', authController.APIKey, executionsController.get)

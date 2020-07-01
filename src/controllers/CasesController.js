@@ -23,7 +23,8 @@ exports.searchCases = async (req, res) => {
 
 exports.deleteCaseByRoleAndCourt = async (req, res) => {
   try {
-    const query = await CaseService.deleteOne(req.params.role, req.body.court_id)
+    const query = await CaseService
+        .deleteOne(req.params.role, req.body.court_id)
     res.json(query)
   } catch (error) {
     logger.info(error)
@@ -33,7 +34,8 @@ exports.deleteCaseByRoleAndCourt = async (req, res) => {
 
 exports.deleteManyCasesByExternalId = async (req, res) => {
   try {
-    const query = await CaseService.deleteManyByExternalId(req.body.external_ids)
+    const query = await CaseService
+        .deleteManyByExternalId(req.body.external_ids)
     res.json(query)
   } catch (error) {
     logger.info(`fail ${error}`)

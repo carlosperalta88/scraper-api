@@ -25,7 +25,7 @@ exports.getReports = async (req, res) => {
 exports.exportReport = async (req, res) => {
   try {
     reportObserver.create(req.body.query)
-    res.json({ message: 'generating report' })
+    res.json({message: 'generating report'})
   } catch (error) {
     logger.error(`failed formatting the cause ${error}`)
     res.send(error).status(500)
