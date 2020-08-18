@@ -2,7 +2,6 @@
 import {EventEmitter} from 'events'
 import ExecutionService from '../../services/executions'
 import CasesDataService from '../../services/casesData'
-import composePromises from '../../lib/composePromises'
 import logger from '../../config/winston'
 
 class ExecutionsObserver extends EventEmitter {

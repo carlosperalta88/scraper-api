@@ -4,7 +4,6 @@ import ScraperService from '../services/scraper'
 import ScraperObserver from '../observers/Scraper'
 import CasesService from '../services/cases'
 import composePromises from '../lib/composePromises'
-import ExecutionObserver from '../observers/Executions'
 
 class ExecutionsService {
   constructor() {}
