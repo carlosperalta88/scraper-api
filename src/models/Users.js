@@ -7,7 +7,7 @@ import basicMethods from '../lib/basic-model-methods'
 const UsersSchema = new Schema({
   'email': {type: String, required: true},
   'client': {type: Clients.schema, required: true, unique: false},
-  'role': {type: Roles.schema, required: true, unique: false},
+  'role': {type: Roles.schema, default: {'name': 'User'}},
   'external_id': String,
   'is_active': Boolean,
 }, {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}})

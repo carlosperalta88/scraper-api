@@ -2,6 +2,9 @@
 import Executions from '../models/Executions'
 import ScraperService from '../services/scraper'
 import ScraperObserver from '../observers/Scraper'
+import CasesService from '../services/cases'
+import composePromises from '../lib/composePromises'
+import ExecutionObserver from '../observers/Executions'
 
 class ExecutionsService {
   constructor() {}
@@ -34,6 +37,25 @@ class ExecutionsService {
     ScraperObserver.add(cases)
     return execution
   }
+
+  async getRolesExternalIds(executionId) {
+    return await Executions.getRolesExternalIds({_id: executionId})
+  }
+
+  pullListOfIds(roles) {
+    return roles[0]['role_external_ids']
+  }
+
+  async getLatestCasesData(externalIds) {
+    return await CasesService.getLatestData({external_id: {$in: externalIds}})
+  }
+
+  async getChanges(executionId) {
+    return await composePromises(
+        this.getRolesExternalIds,
+        this.pullListOfIds,
+        this.getLatestCasesData)(executionId)
+  }
 }
 
-module.exports = new ExecutionsService()
+export default new ExecutionsService()

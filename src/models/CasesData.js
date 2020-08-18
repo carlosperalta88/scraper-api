@@ -19,9 +19,5 @@ CasesDataSchema.index({
 
 CasesDataSchema.plugin(basicMethods)
 
-CasesDataSchema.statics.getLatest = function(query) {
-  return this.find(query).sort({created_at: -1}).limit(1)
-}
-
 const CasesData = mongoose.model('CasesData', CasesDataSchema)
 export default CasesData

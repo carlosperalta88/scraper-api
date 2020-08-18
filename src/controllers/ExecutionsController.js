@@ -51,3 +51,13 @@ exports.start = async (req, res) => {
   }
 }
 
+exports.getChanges = async (req, res) => {
+  try {
+    ExecutionObserver.check(req.params.id)
+    res.json({res: 'Processsing'}).status(200)
+  } catch (error) {
+    logger.info(`Error: looking at changes ${error}`)
+    res.send(error).status(500)
+  }
+}
+

@@ -19,6 +19,9 @@ ExecutionSchema.statics.update = function(executionId, roles) {
       })
 }
 
+ExecutionSchema.statics.getRolesExternalIds = function(query) {
+  return this.find(query).select('role_external_ids')
+}
 
 const Executions = mongoose.model('Executions', ExecutionSchema)
 export default Executions

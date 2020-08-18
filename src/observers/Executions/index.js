@@ -1,6 +1,9 @@
 /* eslint-disable require-jsdoc */
 import {EventEmitter} from 'events'
 import ExecutionService from '../../services/executions'
+import CasesDataService from '../../services/casesData'
+import composePromises from '../../lib/composePromises'
+import logger from '../../config/winston'
 
 class ExecutionsObserver extends EventEmitter {
   constructor() {
@@ -12,6 +15,24 @@ class ExecutionsObserver extends EventEmitter {
         .catch((err) => console.error(err))
     this.emit('rolesAdded', execution['_id'])
     return this
+  }
+
+  async check(executionId) {
+    logger.info(`Starting execution for ${executionId}`)
+    const casesData = await ExecutionService.getChanges(executionId)
+    logger.info(`Comparing Roles`)
+    this.checkRolesFromExecution(casesData)
+    return
+  }
+
+  checkRolesFromExecution(casesData) {
+    for (const data of casesData) {
+      const comparisson = CasesDataService.compare(data['cases'])
+      if (comparisson.length > 0) {
+        logger.info(comparisson, data['external_id'])
+      }
+    }
+    return `done`
   }
 }
 
