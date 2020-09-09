@@ -67,7 +67,44 @@ CasesSchema.statics.getCaseId = function(query) {
 }
 
 CasesSchema.statics.bigSearch = function(query) {
+  console.log(query)
   return this.find(query).cursor()
+}
+
+// Exclude Failed casesData from lookup
+CasesSchema.statics.latestData = function(query) {
+  return this.aggregate([
+    {
+      $match: query,
+    },
+    latestLookup,
+    {$project: {
+      users: 0,
+      clients: 0,
+      court: 0,
+      is_active: 0,
+    }},
+  ])
+}
+
+const latestLookup = {
+  $lookup: {
+    from: 'casesdatas',
+    let: {case_id: '$_id'},
+    pipeline: [
+      {$match: {
+        $expr: {
+          $and: [
+            {$eq: ['$case_id', '$$case_id']},
+            {$ne: ['$document_status', 'Failed']},
+          ],
+        },
+      }},
+      {$sort: {'created_at': -1}},
+      {$limit: 2},
+    ],
+    as: 'cases',
+  },
 }
 
 CasesSchema.statics.buildReport = function(q) {
@@ -126,7 +163,7 @@ const reportAggregation = {
     cover: '$cases.cover',
     external_id: 1,
     cover: 1,
-    date: 1,
+    role_date: '$cases.date',
     scraper_executed: '$cases.created_at',
     last_reception: {
       $let: {

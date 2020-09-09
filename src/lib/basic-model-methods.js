@@ -24,6 +24,6 @@ module.exports = function basicMethods(schema, options) {
   }
 
   schema.statics.create = function(items) {
-    return this.insertMany(items)
+    return this.insertMany([].concat(items))
   }
 }

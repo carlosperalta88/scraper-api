@@ -1,6 +1,6 @@
 node_modules
 error.log
-logs/app.log
+logs/*
 variables.env
 .DS_Store
 build

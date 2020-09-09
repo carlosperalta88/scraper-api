@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 import CasesDataModel from '../models/CasesData'
-import Cases from '../models/Cases'
+import CasesService from '../services/cases'
 import compose from '../lib/compose'
 
 class CasesData {
@@ -48,7 +48,7 @@ class CasesData {
     const re = /\s\w/gm
     const role = (re.test(req.params.role) ?
     req.params.role.split(' ')[0] : req.params.role)
-    const [parentCase] = await Cases.getCaseId(
+    const [parentCase] = await CasesService.getCaseId(
         {$and: [{role: role.trim()}, {'court.name': payload['court']}]})
     payload['case_id'] = parentCase['id']
     return await this.casesData.create(payload)
@@ -58,7 +58,13 @@ class CasesData {
     return await this.casesData.getLatest({caseId})
   }
 
-  compare(newCase, oldCase) {
+  compare(cases) {
+    if (cases.length <= 1) return []
+
+    const tmpCases = cases
+    const [newCase, oldCase] = tmpCases.slice(0, 2)
+
+    const tmpCasesReminder = tmpCases.slice(2) || []
     const variation = []
     const checkProperties =
       ['receptor',
@@ -71,11 +77,11 @@ class CasesData {
       }
     }
 
-    if (variation.length === 0) {
-      return {case_id: newCase['case_id'], variation}
+    if (variation.length > 0) {
+      return variation
     }
 
-    return {case_id: newCase['case_id'], variation}
+    return this.compare(tmpCasesReminder)
   }
 
   didItChange(propA, propB) {

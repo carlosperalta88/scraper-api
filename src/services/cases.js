@@ -66,6 +66,14 @@ class CaseService {
     const users = await this.cases.getCaseUsers(query)
     return users.map((el) => el.email)
   }
+
+  async getCaseId(query) {
+    return await this.cases.getCaseId(query)
+  }
+
+  async getLatestData(query) {
+    return await this.cases.latestData(query)
+  }
 }
 
 module.exports = new CaseService(Cases, CasesData)
