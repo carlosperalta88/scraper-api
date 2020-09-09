@@ -67,6 +67,7 @@ CasesSchema.statics.getCaseId = function(query) {
 }
 
 CasesSchema.statics.bigSearch = function(query) {
+  console.log(query)
   return this.find(query).cursor()
 }
 
@@ -162,7 +163,7 @@ const reportAggregation = {
     cover: '$cases.cover',
     external_id: 1,
     cover: 1,
-    date: 1,
+    role_date: '$cases.date',
     scraper_executed: '$cases.created_at',
     last_reception: {
       $let: {

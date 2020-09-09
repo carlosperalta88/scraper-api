@@ -28,7 +28,7 @@ class ExecutionsObserver extends EventEmitter {
     for (const data of casesData) {
       const comparisson = CasesDataService.compare(data['cases'])
       if (comparisson.length > 0) {
-        logger.info(comparisson, data['external_id'])
+        console.log(`${data['external_id']}, `, comparisson)
       }
     }
     return `done`
